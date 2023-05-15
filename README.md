@@ -61,3 +61,48 @@ Then open [http://localhost:3000](http://localhost:3000) to view it in the brows
 ## Notes
 
 This project is a basic integration of Three.js within React. For complex projects, consider using a wrapper library like [react-three-fiber](https://github.com/pmndrs/react-three-fiber) to better integrate Three.js within the React environment.
+
+## Detailed Components Description
+
+This section provides more detailed information about the main components in the `src/` directory.
+
+### `src/App.js`
+
+This is the main application component. In this minimal setup, it simply serves as a container for the `ThreeScene` component.
+
+The `App` function is a functional component which returns a JSX representation of the component to be rendered. In this case, it's a `div` with the class name "App", and it contains the `ThreeScene` component.
+
+```jsx
+import React from 'react';
+import ThreeScene from './ThreeScene';
+
+function App() {
+  return (
+    <div className="App">
+      <ThreeScene />
+    </div>
+  );
+}
+
+export default App;
+```
+
+### `src/ThreeScene.js`
+
+This file defines a `ThreeCanvas` React component, which is responsible for setting up and rendering a Three.js scene.
+
+The `ThreeCanvas` class extends `React.Component`, meaning it inherits methods from the `React.Component` class. It also defines several methods of its own for setting up and manipulating the Three.js scene:
+
+- `constructor(props)`: This method is called when an object is created from a class. It initializes the `loadManager` and `textureLoader` properties and sets up a callback for when all resources have loaded.
+- `handleAllResourcesLoaded()`: This method is called when all resources (like textures and shaders) have loaded. It logs a message to the console and sets up the scene.
+- `componentDidMount()`: This method is a lifecycle method that runs after the component output has been rendered to the DOM. It loads the texture and then calls `handleAllResourcesLoaded()`.
+- `setupScene()`: This method sets up the Three.js scene. It creates a scene, a camera, a renderer, a mesh (with a plane geometry and the loaded texture as a material), and a light. It adds the mesh and light to the scene, appends the renderer to the document, and starts the animation loop.
+- `animate()`: This method renders the scene and schedules the next frame.
+- `componentWillUnmount()`: This method is another lifecycle method that runs before the component is removed from the DOM. It cancels the animation frame and removes the renderer from the document.
+
+This file also exports the `ThreeCanvas` class as a default export, making it accessible to other files in the project. 
+
+```jsx
+export default ThreeCanvas;
+```
+
