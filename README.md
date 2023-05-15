@@ -86,6 +86,35 @@ function App() {
 
 export default App;
 ```
+### `src/index.js`
+
+This is the entry point to the React application. It's responsible for rendering the top-level `App` component into the root `div` element in `index.html`.
+
+This file first imports the necessary modules: `React`, `ReactDOM`, and `App`. It then creates a root, which is a concurrent root container at the DOM node with the ID of 'root'.
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+```
+
+The `ReactDOM.createRoot()` method is a part of the new Concurrent Mode API introduced in React 18. It creates a root container at the specified DOM node and returns a root instance. The root instance is used to schedule updates to the React tree.
+
+Finally, the `render` method of the root instance is called to render the `App` component into the root `div` element:
+
+```jsx
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+```
+
+The `React.StrictMode` is a wrapper component that checks for potential problems in the app during the development build. It does not render any visible UI, and it activates additional checks and warnings for its descendants.
+
+The `App` component is the main component of the application, which in this case wraps around the `ThreeScene` component.
 
 ### `src/ThreeScene.js`
 
