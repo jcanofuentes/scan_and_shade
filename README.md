@@ -135,3 +135,35 @@ This file also exports the `ThreeCanvas` class as a default export, making it ac
 export default ThreeCanvas;
 ```
 
+## `ThreeScene.js`: Structure and Execution Order
+
+The `ThreeCanvas` component in the `ThreeScene.js` file is a crucial part of our integration between React and Three.js. It's responsible for setting up and managing the Three.js scene within the lifecycle of a React component. Here's a closer look at its structure and execution order:
+
+### Structure
+
+The `ThreeCanvas` component extends `React.Component`, inheriting all the properties and methods of a standard React component. It has several key methods:
+
+**Inherited from `React.Component`:**
+
+- `constructor`: Sets up the initial state and binds the `this` context for our methods.
+- `componentDidMount`: A lifecycle method called after the component has been rendered to the DOM.
+- `componentWillUnmount`: A lifecycle method called just before the component is unmounted and destroyed. This is where cleanup tasks are performed.
+- `render`: A lifecycle method responsible for rendering the component to the DOM.
+
+**Custom methods for handling the Three.js scene:**
+
+- `handleAllResourcesLoaded`: Handles actions to take once all resources are loaded.
+- `setupScene`: Sets up the Three.js scene.
+- `loadTextures`: Loads textures using Three.js's `TextureLoader`.
+- `loadShaders`: Loads shaders using Three.js's `FileLoader`.
+- `animate`: Contains the animation loop.
+
+### Execution Order
+
+1. When a `ThreeCanvas` component is instantiated, the `constructor` method is called first. This sets up the Loading Manager and the function to be called when all resources are loaded.
+2. After the component is rendered to the DOM, React calls the `componentDidMount` method. This begins the loading of textures, and once the texture is loaded, `handleAllResourcesLoaded` is called.
+3. `handleAllResourcesLoaded` calls `setupScene`, which creates the Three.js scene, adds the mesh to it, sets up the camera and renderer, and begins the animation loop.
+4. `animate` is then called on every frame, rendering the scene.
+5. If the component is removed from the DOM, `componentWillUnmount` is called, canceling the animation frame and removing the Three.js renderer from the DOM.
+
+This structure allows us to integrate React's component lifecycle with Three.js's render loop and resource management, providing a seamless user experience.
