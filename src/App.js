@@ -8,10 +8,16 @@ import ThreeSceneCustomPipeline from './ThreeSceneCustomPipeline';
 function App() {
   return (
     <div className="App">
+      {/*
+      <ThreeSceneStandardPipeline />
+      */}
+
       <ThreeSceneCustomPipeline
-        vertexShaderFile='/assets/shaders/vt_simple.glsl'
-        fragmentShaderFile='/assets/shaders/fr_red.glsl'
+        vertexShaderFile='/assets/shaders/vt_bitangent.glsl'
+        fragmentShaderFile='/assets/shaders/fr_normal_map.glsl'
       />
+
+
     </div>
 
   );

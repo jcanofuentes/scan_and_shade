@@ -6,7 +6,7 @@ import * as dat from 'dat.gui';
 class SceneStandardPipeline extends React.Component {
     constructor(props) {
         super(props);
-        console.log("Creating ThreeCanvas instance (inheriting from React.Component.)");
+        console.log("Creating SceneStandardPipeline instance (inheriting from React.Component.)");
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
@@ -21,8 +21,8 @@ class SceneStandardPipeline extends React.Component {
     loadTextures() {
         console.log("Loading textures...");
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
-        this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
+        //this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
+        //this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
         this.normalMap = this.textureLoader.load('/assets/PS_Normal_4096.png');
     }
     createSceneAndRenderer() {
@@ -44,10 +44,6 @@ class SceneStandardPipeline extends React.Component {
     }
     createCameraOrbitControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        //this.controls.minDistance = 1;
-        //this.controls.maxDistance = 10;
-        //this.controls.enablePan = false;
-        //this.controls.enableDamping = true;
     }
     createGeometry() {
         const plane_material = new THREE.MeshPhongMaterial(
@@ -55,12 +51,15 @@ class SceneStandardPipeline extends React.Component {
                 map: this.diffuseMap,
                 normalMap: this.normalMap,
                 wireframe: false
+
             }
         );
         var plane = new THREE.Mesh(
             new THREE.PlaneGeometry(10, 10, 1, 1),
             plane_material
         );
+        //plane_material.normalScale = new THREE.Vector2(2.0,2.0);
+        plane_material.color = new THREE.Color(0.3,0.3,0.3);
         this.scene.add(plane);
     }
     createLights() {

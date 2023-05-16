@@ -52,7 +52,7 @@ class SceneCustomPipeline extends React.Component {
         var fieldOfView = 60.0;
         var aspectRatio = window.innerWidth / window.innerHeight;
         var nearClippingPlane = 0.1;
-        var farClippingPlane = 1000.0;
+        var farClippingPlane = 100.0;
         var cameraDistance = 7.0;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearClippingPlane, farClippingPlane);
         this.camera.position.set(0, 0, cameraDistance);
@@ -66,26 +66,17 @@ class SceneCustomPipeline extends React.Component {
         //this.controls.enableDamping = true;
     }
     createGeometry() {
-        /*
-        const plane_material = new THREE.MeshPhongMaterial(
-            {
-                map: this.diffuseMap,
-                normalMap: this.normalMap,
-                wireframe: false
-            }
-        );
-        */
-
         this.uniforms = THREE.UniformsUtils.merge([
             THREE.UniformsLib.lights,
             {
                 diffuseMap: { value: this.diffuseMap },
                 normalMap: { value: this.normalMap },
-                lightDirection: { value: new THREE.Vector3(0.5, 0.7, 1.0).normalize() }
+                lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+                eyePosition: { value: new THREE.Vector3(0.0, 0.0, 8.0).normalize() }  
             }
         ]);
 
-        const plane_material = new THREE.ShaderMaterial({
+        this.material = new THREE.ShaderMaterial({
             uniforms: this.uniforms,
             vertexShader: this.vertexShader,
             fragmentShader: this.fragmentShader,
@@ -94,13 +85,20 @@ class SceneCustomPipeline extends React.Component {
 
         var plane = new THREE.Mesh(
             new THREE.PlaneGeometry(10, 10, 1, 1),
-            plane_material
+            this.material
         );
         this.scene.add(plane);
     }
     createLights() {
         this.lightsGroup = new THREE.Group();
+        //this.lightsGroup.translateZ(5.25);
         this.scene.add(this.lightsGroup);
+
+        this.dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        this.dirLight.position.set(0, 0, 5.25);
+        this.dirHelper = new THREE.DirectionalLightHelper(this.dirLight, 0.5);
+        this.scene.add(this.dirHelper);
+        this.lightsGroup.add(this.dirLight);
 
         this.pointLight = new THREE.PointLight(0xffffff, 1, 32, 1.1);
         this.pointLight.position.set(0, 0, 5.25);
@@ -108,11 +106,17 @@ class SceneCustomPipeline extends React.Component {
         this.scene.add(this.pointLightHelper);
         this.lightsGroup.add(this.pointLight);
 
-        this.dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        this.dirLight.position.set(0, 0, 5.25);
-        this.dirHelper = new THREE.DirectionalLightHelper(this.dirLight, 0.5);
-        this.scene.add(this.dirHelper);
-        this.lightsGroup.add(this.dirLight);
+        /*
+        spotLight = new THREE.SpotLight( 0xaaaaaa );
+        spotLight.position.set( 1000, 500, 1000 );
+        spotLight.castShadow = true;
+        spotLight.shadowCameraNear = 500;
+        spotLight.shadowCameraFov = 70;
+        spotLight.shadowBias = 0.001;
+        spotLight.shadowMapWidth = 1024;
+        spotLight.shadowMapHeight = 1024;
+        scene.add( spotLight );
+        */
 
         this.dirLight.visible = false;
         this.dirHelper.visible = false;
@@ -130,8 +134,8 @@ class SceneCustomPipeline extends React.Component {
             distance: 0.0
         };
         const guiLightsGroup = gui.addFolder('Lighting');
-        guiLightsGroup.add(this.lightParameters, 'azimuth', -Math.PI, Math.PI);
-        guiLightsGroup.add(this.lightParameters, 'distance', -Math.PI, Math.PI);
+        guiLightsGroup.add(this.lightParameters, 'azimuth', -Math.PI, Math.PI).step(0.1);
+        guiLightsGroup.add(this.lightParameters, 'distance', -Math.PI, Math.PI).step(0.1);
 
         const options = {
             toggle: false,
@@ -154,18 +158,14 @@ class SceneCustomPipeline extends React.Component {
     }
     setupScene() {
         console.log('Scene setup...');
-
         THREE.ColorManagement.enabled = true;
         this.createSceneAndRenderer();
-        //this.createHelpers();
+        this.createHelpers();
         this.createPerspectiveCamera();
         this.createCameraOrbitControls();
         this.createGeometry();
-
         this.createLights();
-
         this.createGUI();
-
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
     }
@@ -180,9 +180,33 @@ class SceneCustomPipeline extends React.Component {
     animate() {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
+
+
         this.lightsGroup.rotation.x = this.lightParameters.distance;
         this.lightsGroup.rotation.y = this.lightParameters.azimuth;
-        //  this.material.uniforms.lightDirection.value = this.secondLightDirection;
+        /*
+                let azimuth = this.lightParameters.azimuth;
+                let elevation = this.lightParameters.distance;
+        
+                let x = Math.cos(elevation) * Math.cos(azimuth);
+                let y = Math.cos(elevation) * Math.sin(azimuth);
+                let z = Math.sin(elevation);
+        
+                let directionVector = new THREE.Vector3( x, y ,z );
+                let dir = directionVector.normalize();
+                this.material.uniforms.lightDirection.value = dir;
+        */
+        //this.material.uniforms.lightPos.value = this.pointLight.position
+
+        //console.log( "x: " + this.lightsGroup.position.x + "y: " + this.lightsGroup.position.y );
+        
+        let worldPosition = new THREE.Vector3();
+        this.pointLight.getWorldPosition(worldPosition);
+
+        this.material.uniforms.lightPosition.value = worldPosition;
+        this.material.uniforms.eyePosition.value = this.camera.position;
+
+    
         this.renderer.render(this.scene, this.camera);
     }
 
