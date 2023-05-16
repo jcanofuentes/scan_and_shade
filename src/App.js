@@ -4,7 +4,7 @@ import ThreeBasicScene from './ThreeBasicScene';
 function App() {
   return (
     <div className="App">
-      <ThreeBasicScene />
+      <ThreeScene />
     </div>
   );
 }

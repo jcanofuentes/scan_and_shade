@@ -8,6 +8,7 @@ class ThreeCanvas extends React.Component {
         console.log("Creating ThreeCanvas instance (inheriting from React.Component.)");
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
+        this.updateDimensions = this.updateDimensions.bind(this);
     }
     // ------------------------------------------------------------------------------
     // Custom methods for handling the Three.js scene:
@@ -92,7 +93,14 @@ class ThreeCanvas extends React.Component {
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
     }
-
+    updateDimensions() {
+        if (this.mount !== null) {
+            this.renderer.setSize(this.mount.clientWidth,this.mount.clientHeight);
+            this.camera.aspect = this.mount.clientWidth / this.mount.clientHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.render(this.scene, this.camera);
+        }
+    }
     animate() {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
@@ -105,6 +113,7 @@ class ThreeCanvas extends React.Component {
     componentDidMount() {
         console.log("componentDidMount");
         this.loadTextures();
+        window.addEventListener("resize", this.updateDimensions);
     }
 
     componentWillUnmount() {
@@ -113,11 +122,13 @@ class ThreeCanvas extends React.Component {
         if (this.renderer) {
             this.mount.removeChild(this.renderer.domElement);
         }
+        window.removeEventListener("resize", this.updateDimensions);
     }
 
     render() {
         return (
             <div
+                style={{ width: "100vw", height: "75vw" }}
                 ref={ref => (this.mount = ref)}
             />
         );
