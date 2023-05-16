@@ -78,30 +78,28 @@ class ThreeCanvas extends React.Component {
         );
         this.scene.add(plane);
     }
-    createDirectionalLight() {
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(0, 0, 5.25);
-        //this.scene.add(light);
-        const group = new THREE.Group();
-        group.add(light)
-        const controls = new OrbitControls(group, this.renderer.domElement);
-        controls.target.z = 0.001;
-        this.scene.add(group)
-        const helper = new THREE.DirectionalLightHelper(light, 0.5);
-        this.scene.add(helper);
+    createLights() {
+        this.lightsGroup = new THREE.Group();
+        this.scene.add(this.lightsGroup);
+
+        this.pointLight = new THREE.PointLight(0xffffff, 1, 32, 1.1);
+        this.pointLight.position.set(0, 0, 5.25);
+        this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, 0.125);
+        this.scene.add(this.pointLightHelper);
+        this.lightsGroup.add(this.pointLight);
+
+        this.dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        this.dirLight.position.set(0, 0, 5.25);
+        this.dirHelper = new THREE.DirectionalLightHelper(this.dirLight, 0.5);
+        this.scene.add( this.dirHelper);
+        this.lightsGroup.add(this.dirLight);
+
+        this.dirLight.visible = false;
+        this.dirHelper.visible = false;
+        this.pointLight.visible = true;
+        this.pointLightHelper.visible = true;
     }
-    createPointLight() {
-        const pointLight = new THREE.PointLight(0xffffff, 1, 32, 1.1);
-        pointLight.position.set(0, 0, 5.25);
-        //this.scene.add(pointLight);
-        const sphereSize = 0.125;
-        const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
-        this.scene.add(pointLightHelper);
-        const group = new THREE.Group();
-        group.add(pointLight)
-        const controls = new OrbitControls(group, this.renderer.domElement);
-        this.scene.add(group)
-    }
+
     createHelpers() {
         const axesHelper = new THREE.AxesHelper(1);
         this.scene.add(axesHelper);
@@ -113,18 +111,38 @@ class ThreeCanvas extends React.Component {
         this.createSceneAndRenderer();
         //this.createHelpers();
         this.createPerspectiveCamera();
-        //this.createCameraOrbitControls();
+        this.createCameraOrbitControls();
         this.createGeometry();
 
-        this.createDirectionalLight();
-        //this.createPointLight();
+        this.createLights();
 
         const gui = new dat.GUI();
-        const settings = {
-            value: 0.5
+        this.lightParameters = {
+            azimuth: 0.0,
+            distance: 0.0
+        };
+        const guiLightsGroup = gui.addFolder('Lighting');
+        guiLightsGroup.add(this.lightParameters, 'azimuth', -Math.PI, Math.PI);
+        guiLightsGroup.add(this.lightParameters, 'distance', -Math.PI, Math.PI);
+
+        const options = {
+            toggle: false,
         };
 
-        gui.add(settings, 'value', 0, 1);
+        // Choose between directional o point lights
+        guiLightsGroup.add(options, 'toggle').name('Point / Directional').onChange((value) => {
+            if (value == true) {
+                this.dirLight.visible = true;
+                this.dirHelper.visible = true;
+                this.pointLight.visible = false;
+                this.pointLightHelper.visible = false;
+            } else {
+                this.dirLight.visible = false;
+                this.dirHelper.visible = false;
+                this.pointLight.visible = true;
+                this.pointLightHelper.visible = true;
+            }
+        });
 
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
@@ -139,7 +157,9 @@ class ThreeCanvas extends React.Component {
     }
     animate() {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
-        //this.controls.update();
+        this.controls.update();
+        this.lightsGroup.rotation.x = this.lightParameters.distance;
+        this.lightsGroup.rotation.y = this.lightParameters.azimuth;
         this.renderer.render(this.scene, this.camera);
     }
 
