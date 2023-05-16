@@ -1,11 +1,10 @@
 import React from 'react';
 import ThreeScene from './ThreeScene';
-import ThreeSceneBasic from './ThreeSceneBasic';
-
+import ThreeBasicScene from './ThreeBasicScene';
 function App() {
   return (
     <div className="App">
-      <ThreeScene />
+      <ThreeBasicScene />
     </div>
   );
 }

@@ -6,7 +6,6 @@ class ThreeCanvas extends React.Component {
     constructor(props) {
         super(props);
         console.log("Creating ThreeCanvas instance (inheriting from React.Component.)");
-        THREE.ColorManagement.enabled = true;
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
     }
@@ -36,12 +35,11 @@ class ThreeCanvas extends React.Component {
             this.fragmentShader = data;
         });
     }
-    createRenderer() {
+    createSceneAndRenderer() {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x222222);
-    }
-    createScene() {
+
         this.scene = new THREE.Scene();
     }
     createPerspectiveCamera() {
@@ -85,13 +83,12 @@ class ThreeCanvas extends React.Component {
     setupScene() {
         console.log('Scene setup...');
 
-        this.createRenderer();
-        this.createScene();
+        THREE.ColorManagement.enabled = true;
+        this.createSceneAndRenderer();
         this.createPerspectiveCamera();
         this.createGeometry();
         this.createLights();
         this.createHelpers();
-
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
     }
@@ -107,10 +104,7 @@ class ThreeCanvas extends React.Component {
     // ------------------------------------------------------------------------------
     componentDidMount() {
         console.log("componentDidMount");
-
-
         this.loadTextures();
-        //this.loadShaders();
     }
 
     componentWillUnmount() {
