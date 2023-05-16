@@ -2,6 +2,7 @@ import Joystick from './Joystick';
 import React from "react";
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as dat from 'dat.gui';
 
 class ThreeCanvas extends React.Component {
     constructor(props) {
@@ -114,9 +115,16 @@ class ThreeCanvas extends React.Component {
         this.createPerspectiveCamera();
         //this.createCameraOrbitControls();
         this.createGeometry();
-        
+
         this.createDirectionalLight();
         //this.createPointLight();
+
+        const gui = new dat.GUI();
+        const settings = {
+            value: 0.5
+        };
+
+        gui.add(settings, 'value', 0, 1);
 
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
@@ -152,16 +160,16 @@ class ThreeCanvas extends React.Component {
         }
         window.removeEventListener("resize", this.updateDimensions);
     }
-    
-        render() {
-            return (
-                <div
-                    style={{ width: "100vw", height: "100vw" }}
-                    ref={ref => (this.mount = ref)}
-                />
-            );
-        }
-    
+
+    render() {
+        return (
+            <div
+                style={{ width: "100vw", height: "100vw" }}
+                ref={ref => (this.mount = ref)}
+            />
+        );
+    }
+
     /*
         render() {
             return (
@@ -174,7 +182,7 @@ class ThreeCanvas extends React.Component {
                 </div>
             );
         }
-    */    
+    */
 
 }
 
