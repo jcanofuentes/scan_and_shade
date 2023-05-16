@@ -1,3 +1,4 @@
+import Joystick from './Joystick';
 import React from "react";
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -48,36 +49,59 @@ class ThreeCanvas extends React.Component {
         var aspectRatio = window.innerWidth / window.innerHeight;
         var nearClippingPlane = 0.1;
         var farClippingPlane = 1000.0;
-        var cameraDistance = 20.0;
+        var cameraDistance = 7.0;
         this.camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearClippingPlane, farClippingPlane);
         this.camera.position.set(0, 0, cameraDistance);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+
+    }
+    createCameraOrbitControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        //this.controls.minDistance = 1;
+        //this.controls.maxDistance = 10;
+        //this.controls.enablePan = false;
+        //this.controls.enableDamping = true;
     }
     createGeometry() {
         const plane_material = new THREE.MeshPhongMaterial(
             {
                 map: this.diffuseMap,
+                normalMap: this.normalMap,
                 wireframe: false
             }
         );
         var plane = new THREE.Mesh(
-            new THREE.PlaneGeometry(5, 5, 5, 5),
+            new THREE.PlaneGeometry(10, 10, 1, 1),
             plane_material
         );
         this.scene.add(plane);
     }
-    createLights() {
-        this.scene.add(new THREE.AmbientLight(0xeef0ff));
-        /*
+    createDirectionalLight() {
         const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(0, 0, 1);
-        this.scene.add(light);
-        */
+        light.position.set(0, 0, 5.25);
+        //this.scene.add(light);
+        const group = new THREE.Group();
+        group.add(light)
+        const controls = new OrbitControls(group, this.renderer.domElement);
+        controls.target.z = 0.001;
+        this.scene.add(group)
+        const helper = new THREE.DirectionalLightHelper(light, 0.5);
+        this.scene.add(helper);
+    }
+    createPointLight() {
+        const pointLight = new THREE.PointLight(0xffffff, 1, 32, 1.1);
+        pointLight.position.set(0, 0, 5.25);
+        //this.scene.add(pointLight);
+        const sphereSize = 0.125;
+        const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+        this.scene.add(pointLightHelper);
+        const group = new THREE.Group();
+        group.add(pointLight)
+        const controls = new OrbitControls(group, this.renderer.domElement);
+        this.scene.add(group)
     }
     createHelpers() {
-        // Create some helpers
         const axesHelper = new THREE.AxesHelper(1);
         this.scene.add(axesHelper);
     }
@@ -86,16 +110,20 @@ class ThreeCanvas extends React.Component {
 
         THREE.ColorManagement.enabled = true;
         this.createSceneAndRenderer();
+        //this.createHelpers();
         this.createPerspectiveCamera();
+        //this.createCameraOrbitControls();
         this.createGeometry();
-        this.createLights();
-        this.createHelpers();
+        
+        this.createDirectionalLight();
+        //this.createPointLight();
+
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
     }
     updateDimensions() {
         if (this.mount !== null) {
-            this.renderer.setSize(this.mount.clientWidth,this.mount.clientHeight);
+            this.renderer.setSize(this.mount.clientWidth, this.mount.clientHeight);
             this.camera.aspect = this.mount.clientWidth / this.mount.clientHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.render(this.scene, this.camera);
@@ -103,7 +131,7 @@ class ThreeCanvas extends React.Component {
     }
     animate() {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
-        this.controls.update();
+        //this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -124,15 +152,30 @@ class ThreeCanvas extends React.Component {
         }
         window.removeEventListener("resize", this.updateDimensions);
     }
+    
+        render() {
+            return (
+                <div
+                    style={{ width: "100vw", height: "100vw" }}
+                    ref={ref => (this.mount = ref)}
+                />
+            );
+        }
+    
+    /*
+        render() {
+            return (
+                <div>
+                    <Joystick onChange={this.handleJoystickChange} />
+                    <div
+                        style={{ width: "100vw", height: "75vw" }}
+                        ref={ref => (this.mount = ref)}
+                    />
+                </div>
+            );
+        }
+    */    
 
-    render() {
-        return (
-            <div
-                style={{ width: "100vw", height: "75vw" }}
-                ref={ref => (this.mount = ref)}
-            />
-        );
-    }
 }
 
 export default ThreeCanvas;
