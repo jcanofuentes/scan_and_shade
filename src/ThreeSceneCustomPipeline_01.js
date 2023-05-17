@@ -67,13 +67,16 @@ class SceneCustomPipeline extends React.Component {
     }
     createGeometry() {
 
+        const colorUniform = { value: new THREE.Color(1,1,1) } 
+
         this.uniforms = THREE.UniformsUtils.merge([
             THREE.UniformsLib.lights,
             {
+                uColor: colorUniform,
                 diffuseMap: { value: this.diffuseMap },
                 normalMap: { value: this.normalMap },
-                lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
-                normalScale: { value: new THREE.Vector2(1.0, 1.0) },
+                lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+                lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() }
             }
         ]);
 
@@ -91,6 +94,11 @@ class SceneCustomPipeline extends React.Component {
             this.material
         );
         this.scene.add(plane);
+
+        // Test sphere
+        const geometry = new THREE.SphereGeometry( 2 );
+        const sphere = new THREE.Mesh( geometry, this.material );
+        //this.scene.add(sphere);
     }
     createLights() {
         this.lightsGroup = new THREE.Group();
@@ -127,7 +135,7 @@ class SceneCustomPipeline extends React.Component {
         this.pointLightHelper.visible = true;
     }
     createHelpers() {
-        const axesHelper = new THREE.AxesHelper(1);
+        const axesHelper = new THREE.AxesHelper(10);
         this.scene.add(axesHelper);
     }
     createGUI() {
@@ -184,7 +192,6 @@ class SceneCustomPipeline extends React.Component {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
 
-
         this.lightsGroup.rotation.x = this.lightParameters.elevation;
         this.lightsGroup.rotation.y = this.lightParameters.azimuth;
 
@@ -200,10 +207,11 @@ class SceneCustomPipeline extends React.Component {
 
         //this.material.uniforms.lightPos.value = this.pointLight.position
         //console.log( "x: " + this.lightsGroup.position.x + "y: " + this.lightsGroup.position.y );
-        //let worldPosition = new THREE.Vector3();
-        //this.pointLight.getWorldPosition(worldPosition);
-        //this.material.uniforms.lightPosition.value = worldPosition;
+        let worldPosition = new THREE.Vector3();
+        this.pointLight.getWorldPosition(worldPosition);
+        this.material.uniforms.lightPosition.value = worldPosition;
 
+        //console.log( "[ " + worldPosition.x + ", " + worldPosition.y + ", " + worldPosition.z + " ]");
 
         this.renderer.render(this.scene, this.camera);
     }

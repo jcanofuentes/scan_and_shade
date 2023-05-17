@@ -13,19 +13,16 @@ varying vec3 vWorldPosition;
 varying vec3 vLightPosition;
 
 void main() {
-    vec3 normalColor = texture2D(normalMap, vUv).xyz;
-    vec3 normal = normalColor * 2.0 - 1.0;
-    vec3 normal_2 = normalize(vTbn * normal); 
-
+   
+    vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+	vec3 normal = normalize( mapN );
 
     //gl_FragColor = vec4(normal, 1.0);
-    vec3 color = texture2D(diffuseMap, vUv).xyz;
-
     vec3 lightdir = vLightPosition - vWorldPosition;
 
     lightdir = -normalize(lightdir.xyz);
 
-	float lighting = clamp(dot(lightdir, normal_2), 0.0, 1.0);
+	float lighting = clamp(dot(lightdir, normal), 0.0, 1.0);
 
     lighting *= 0.2;
     gl_FragColor = vec4(lighting, lighting, lighting, 1.0);
