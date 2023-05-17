@@ -38,41 +38,25 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 precision highp float;
 
-varying vec3 vNormal;           // TODO
+varying vec3 vNormal;           // Vertex normal
 varying vec2 vUv;               // UV coordinates for texturing
 varying vec3 vViewPosition;     // Vertex position in camera view space with inverted coordinates
-
-uniform vec3 lightDirection;
+varying vec3 fPosition;         // Vertex position in camera view space
 
 void main() {
-    // We directly pass the UV coordinates to the fragment shader.
-    // These coordinates will be interpolated for each fragment.
+
     vUv = uv;
 
-    // We convert the vertex position to a 3D vector.
+    vec4 pos = modelViewMatrix * vec4(position, 1.0);
+    fPosition = pos.xyz;
+
     vec3 transformed = vec3(position);
-
-    // We convert the 3D position to a 4D position, assuming that the W component is 1.0.
     vec4 viewModelPosition = vec4(transformed, 1.0);
-
-    // We multiply the vertex position by the model-view matrix.
-    // This matrix transforms the vertex position to camera space.
     viewModelPosition = modelViewMatrix * viewModelPosition;
-
-    // This space is suitable for further transformations so we apply the projectionMatrix 
-    vec4 perspectiveSpace = projectionMatrix * viewModelPosition;
-
-    // The final position of the vertex for the rasterizer is obtained by multiplying
-    // the position in camera space by the projection matrix.
-    gl_Position = perspectiveSpace;
-
-    // We calculate the vertex position in camera space, but with inverted coordinates.
-    // This is useful for calculations in the fragment shader, for example, to calculate the direction from the camera to the vertex.
+    gl_Position = projectionMatrix * viewModelPosition;
     vViewPosition = -viewModelPosition.xyz;
+    fPosition = viewModelPosition.xyz;
 
+    vNormal = normal * normalMatrix;
     //vNormal = normal;
-
-    // Rotate the object normals by a 3x3 normal matrix.
-    // We could also do this CPU-side to avoid doing it per-vertex
-    vNormal = normalize(normalMatrix * normal);
 }

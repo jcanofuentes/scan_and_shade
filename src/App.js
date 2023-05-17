@@ -4,6 +4,7 @@ import ThreeScene from './ThreeScene';
 import ThreeSceneStandardPipeline from './ThreeSceneStandardPipeline';
 import ThreeSceneCustomPipeline from './ThreeSceneCustomPipeline';
 import ThreeSceneCustomPipeline_01 from './ThreeSceneCustomPipeline_01';
+import ThreeSceneCustomPipeline_02 from './ThreeSceneCustomPipeline_02';
 
 function App() {
   return (
@@ -11,6 +12,13 @@ function App() {
       {/*
       <ThreeSceneStandardPipeline />
       */}
+
+      {
+
+      <ThreeSceneCustomPipeline_02
+        vertexShaderFile='/assets/shaders/normal_mapping_02/vertex.glsl'
+        fragmentShaderFile='/assets/shaders/normal_mapping_02/fragment.glsl'
+      />}
 
       {/* CLOSE...!
 

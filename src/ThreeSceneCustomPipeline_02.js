@@ -3,17 +3,27 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui';
 
-class SceneCustomPipeline_01 extends React.Component {
+class SceneCustomPipeline_02 extends React.Component {
     constructor(props) {
         super(props);
-        console.log("Creating SceneCustomPipeline_01 instance (inheriting from React.Component.)");
+        console.log("Creating SceneCustomPipeline_02 instance (inheriting from React.Component.)");
 
         this.vertexShaderFile = props.vertexShaderFile;
         this.fragmentShaderFile = props.fragmentShaderFile;
 
+
+
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
+
+        this.lighPosition = new THREE.Vector3(0.0);
+        this.lightDirection = new THREE.Vector3(0.0);
+
+        this.clock = new THREE.Clock();
+        this.iResolution = new THREE.Vector2(0.0);
+        this.material = null;
+
     }
     // ------------------------------------------------------------------------------
     // Custom methods for handling the Three.js scene:
@@ -21,6 +31,7 @@ class SceneCustomPipeline_01 extends React.Component {
     handleAllResourcesLoaded() {
         console.log('All resources loaded succesfully!');
         this.setupScene();
+        this.updateDimensions();
     }
     loadTextures() {
         console.log("Loading textures...");
@@ -67,12 +78,14 @@ class SceneCustomPipeline_01 extends React.Component {
     }
     createGeometry() {
 
-        const colorUniform = { value: new THREE.Color(1,1,1) } 
+        const colorUniform = { value: new THREE.Color(1, 1, 1) }
 
         this.uniforms = THREE.UniformsUtils.merge([
             THREE.UniformsLib.lights,
             {
                 uColor: colorUniform,
+                iResolution: { value: new THREE.Vector2(1.0, 1.0) },
+                iTime: { type: 'f', value: 0.0 },
                 diffuseMap: { value: this.diffuseMap },
                 normalMap: { value: this.normalMap },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
@@ -96,9 +109,9 @@ class SceneCustomPipeline_01 extends React.Component {
         this.scene.add(plane);
 
         // Test sphere
-        const geometry = new THREE.SphereGeometry( 2 );
-        const sphere = new THREE.Mesh( geometry, this.material );
-        //this.scene.add(sphere);
+        const geometry = new THREE.SphereGeometry(2.5);
+        this.sphere = new THREE.Mesh(geometry, this.material);
+        this.scene.add(this.sphere);
     }
     createLights() {
         this.lightsGroup = new THREE.Group();
@@ -106,13 +119,13 @@ class SceneCustomPipeline_01 extends React.Component {
         this.scene.add(this.lightsGroup);
 
         this.dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        this.dirLight.position.set(0, 0, 5.25);
+        this.dirLight.position.set(0, 0, 0);
         this.dirHelper = new THREE.DirectionalLightHelper(this.dirLight, 0.5);
         this.scene.add(this.dirHelper);
         this.lightsGroup.add(this.dirLight);
 
         this.pointLight = new THREE.PointLight(0xffffff, 1, 32, 1.1);
-        this.pointLight.position.set(0, 0, 5.25);
+        this.pointLight.position.set(0, 0, 0);
         this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, 0.125);
         this.scene.add(this.pointLightHelper);
         this.lightsGroup.add(this.pointLight);
@@ -135,7 +148,7 @@ class SceneCustomPipeline_01 extends React.Component {
         this.pointLightHelper.visible = true;
     }
     createHelpers() {
-        const axesHelper = new THREE.AxesHelper(10);
+        const axesHelper = new THREE.AxesHelper(5);
         this.scene.add(axesHelper);
     }
     createGUI() {
@@ -144,9 +157,9 @@ class SceneCustomPipeline_01 extends React.Component {
             azimuth: 0.0,
             elevation: 0.0
         };
-        const guiLightsGroup = gui.addFolder('Lighting');
-        guiLightsGroup.add(this.lightParameters, 'azimuth', -Math.PI, Math.PI).step(0.1);
-        guiLightsGroup.add(this.lightParameters, 'elevation', -Math.PI, Math.PI).step(0.1);
+        const guiLightsGroup = gui.addFolder('SHADER_PARAMETERS');
+        guiLightsGroup.add(this.lightParameters, 'azimuth', -Math.PI * 0.5, Math.PI * 0.5).step(0.1);
+        guiLightsGroup.add(this.lightParameters, 'elevation', -Math.PI * 0.5, Math.PI * 0.5).step(0.1);
 
         const options = {
             toggle: false,
@@ -166,6 +179,17 @@ class SceneCustomPipeline_01 extends React.Component {
                 this.pointLightHelper.visible = true;
             }
         });
+
+        const guiValuesGroup = gui.addFolder('LIGHT_SOURCE_DATA');
+        guiValuesGroup.add(this.lighPosition, 'x').step(0.05).name('POS_X').listen();
+        guiValuesGroup.add(this.lighPosition, 'y').step(0.05).name('POS_Y').listen();
+        guiValuesGroup.add(this.lighPosition, 'z').step(0.05).name('POS_Z').listen();
+        guiValuesGroup.add(this.lightDirection, 'x').step(0.05).name('DIR_X').listen();
+        guiValuesGroup.add(this.lightDirection, 'y').step(0.05).name('DIR_Y').listen();
+        guiValuesGroup.add(this.lightDirection, 'z').step(0.05).name('DIR_Z').listen();
+
+        guiLightsGroup.open();
+        guiValuesGroup.open();
     }
     setupScene() {
         console.log('Scene setup...');
@@ -182,6 +206,8 @@ class SceneCustomPipeline_01 extends React.Component {
     }
     updateDimensions() {
         if (this.mount !== null) {
+            this.iResolution.x = this.mount.clientWidth;
+            this.iResolution.y = this.mount.clientHeight;
             this.renderer.setSize(this.mount.clientWidth, this.mount.clientHeight);
             this.camera.aspect = this.mount.clientWidth / this.mount.clientHeight;
             this.camera.updateProjectionMatrix();
@@ -189,29 +215,93 @@ class SceneCustomPipeline_01 extends React.Component {
         }
     }
     animate() {
+
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
 
-        this.lightsGroup.rotation.x = this.lightParameters.elevation;
-        this.lightsGroup.rotation.y = this.lightParameters.azimuth;
+        
+        //this.lightsGroup.rotation.x = this.lightParameters.elevation;
+        //this.lightsGroup.rotation.y = this.lightParameters.azimuth;
 
-        let azimuth = this.lightParameters.azimuth;
+        let azimuth = this.lightParameters.azimuth + Math.PI*0.5;
         let elevation = this.lightParameters.elevation;
         let x = Math.cos(azimuth) * Math.cos(elevation);
         let y = Math.sin(elevation);
         let z = Math.sin(azimuth) * Math.cos(elevation);
 
-        let directionVector = new THREE.Vector3(x, y, z);
-        let dir = directionVector.normalize();
-        this.material.uniforms.lightDirection.value = dir;
+        this.lighPosition.x = x;
+        this.lighPosition.y = y;
+        this.lighPosition.z = z;
 
-        //this.material.uniforms.lightPos.value = this.pointLight.position
-        //console.log( "x: " + this.lightsGroup.position.x + "y: " + this.lightsGroup.position.y );
-        let worldPosition = new THREE.Vector3();
-        this.pointLight.getWorldPosition(worldPosition);
-        this.material.uniforms.lightPosition.value = worldPosition;
+        //this.lightsGroup.lookAt(this.lighPosition);
+        var radius = 5.0;
+        this.lightsGroup.position.x =  this.lighPosition.x * radius;
+        this.lightsGroup.position.y =  this.lighPosition.y * radius;
+        this.lightsGroup.position.z =  this.lighPosition.z * radius;
+
+        if (this.material != null )
+        {
+            this.material.uniforms.lightPosition.value = this.lighPosition;
+        }
+
+        /*
+        // Calculamos la dirección
+        this.lightDirection.x = x;
+        this.lightDirection.y = y;
+        this.lightDirection.z = z;
+        this.lightDirection = this.lightDirection.normalize();
+        this.material.uniforms.lightDirection.value = this.lightDirection;
+
+        // Calculamos la posición de la luz en espacio de vista (view space)
+        let pos = new THREE.Vector3(0.0);
+        this.pointLight.getWorldPosition(pos);
+        var viewMatrix = this.camera.matrixWorldInverse; // matriz de vista de la cámara
+        pos.applyMatrix4(viewMatrix); // transformamos a espacio de vista
+        this.material.uniforms.lightPosition.value = pos;
+        this.lighPosition = pos;
+        */
+
+        //let lighPos = THREE.Vector3(Math.sin(this.clock.getElapsedTime() * 1.0) * 20.0, 0.0, Math.cos(this.clock.getElapsedTime() * 1.0) * 20.0);
+
+        /*
+        // Animacion
+        var lightHeight = 2.0;
+        var lightPathDiameter = 3.0;
+        var lightPathAnimationSpeed = 0.5;
+        this.lighPosition.z = lightHeight;
+        this.lighPosition.x = Math.sin(this.clock.getElapsedTime() * lightPathAnimationSpeed) * lightPathDiameter;
+        this.lighPosition.y = Math.cos(this.clock.getElapsedTime() * lightPathAnimationSpeed) * lightPathDiameter;
+        this.material.uniforms.lightPosition.value = this.lighPosition;
+        this.lightsGroup.lookAt(this.lighPosition);
+        */
+
+        // Shader toy compatibility...
+        this.material.uniforms.iResolution.value = this.iResolution;
+        const ellapsed = this.clock.getElapsedTime();
+        this.material.uniforms.iTime.value = ellapsed;
+
+        //this.sphere.rotation.y += 0.005;
+
+        //this.material.uniforms.lightPosition.value = this.lighPosition;
+        //let lightPositionWorld = new THREE.Vector3(0.0);
+
+        /*
+        lightPositionWorld.x = this.lighPosition.x;
+        lightPositionWorld.y = this.lighPosition.y;
+        lightPositionWorld.z = this.lighPosition.z;
+        var viewMatrix = this.camera.matrixWorldInverse; // matriz de vista de la cámara
+        var lightPositionView = lightPositionWorld.applyMatrix4(viewMatrix); // transformamos a espacio de vista
+        this.material.uniforms.lightPosition.value = this.lighPosition;
+*/
+
+        //this.material.uniforms.lightPosition.value = this.lighPosition;
+
+        //this.pointLight.getWorldPosition(this.lighPosition);
+
 
         //console.log( "[ " + worldPosition.x + ", " + worldPosition.y + ", " + worldPosition.z + " ]");
+
+
 
         this.renderer.render(this.scene, this.camera);
     }
@@ -260,4 +350,4 @@ class SceneCustomPipeline_01 extends React.Component {
 
 }
 
-export default SceneCustomPipeline_01;
+export default SceneCustomPipeline_02;
