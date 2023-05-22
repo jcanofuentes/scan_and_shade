@@ -11,8 +11,6 @@ class SceneCustomPipeline_02 extends React.Component {
         this.vertexShaderFile = props.vertexShaderFile;
         this.fragmentShaderFile = props.fragmentShaderFile;
 
-
-
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
@@ -36,9 +34,9 @@ class SceneCustomPipeline_02 extends React.Component {
     loadTextures() {
         console.log("Loading textures...");
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
-        this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/PS_Normal_4096.png');
+        this.texDiffuse = this.textureLoader.load('/assets/PS_Albedo_4096.png');
+        //this.texDiffuse.colorSpace = THREE.SRGBColorSpace;
+        this.texNormal = this.textureLoader.load('/assets/PS_Normal_4096.png');
     }
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.loadManager);
@@ -78,18 +76,27 @@ class SceneCustomPipeline_02 extends React.Component {
     }
     createGeometry() {
 
-        const colorUniform = { value: new THREE.Color(1, 1, 1) }
+        const colorUniform = { value: new THREE.Color(1, 1, 1) };
 
         this.uniforms = THREE.UniformsUtils.merge([
             THREE.UniformsLib.lights,
             {
-                uColor: colorUniform,
                 iResolution: { value: new THREE.Vector2(1.0, 1.0) },
                 iTime: { type: 'f', value: 0.0 },
-                diffuseMap: { value: this.diffuseMap },
-                normalMap: { value: this.normalMap },
+
+                texDiffuse: { value: this.texDiffuse },
+                texNormal: { value: this.texNormal },
+
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
-                lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() }
+                lightColor: { value: new THREE.Color(1,1,1) },
+                lightAmbient: { value: new THREE.Color(0.4,0.4,0.4) },
+                lightFalloff: { type: 'f', value: 0.15 },
+                lightRadius: { type: 'f', value: 6.0 },
+
+                lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+                projection: { value: new THREE.Matrix4() },
+                view: { value: new THREE.Matrix4() },
+                model: { value: new THREE.Matrix4() }
             }
         ]);
 
@@ -111,7 +118,7 @@ class SceneCustomPipeline_02 extends React.Component {
         // Test sphere
         const geometry = new THREE.SphereGeometry(2.5);
         this.sphere = new THREE.Mesh(geometry, this.material);
-        this.scene.add(this.sphere);
+        //this.scene.add(this.sphere);
     }
     createLights() {
         this.lightsGroup = new THREE.Group();
@@ -198,8 +205,8 @@ class SceneCustomPipeline_02 extends React.Component {
         this.createHelpers();
         this.createPerspectiveCamera();
         this.createCameraOrbitControls();
-        this.createGeometry();
         this.createLights();
+        this.createGeometry();
         this.createGUI();
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
@@ -219,29 +226,29 @@ class SceneCustomPipeline_02 extends React.Component {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
 
-        
+
         //this.lightsGroup.rotation.x = this.lightParameters.elevation;
         //this.lightsGroup.rotation.y = this.lightParameters.azimuth;
 
-        let azimuth = this.lightParameters.azimuth + Math.PI*0.5;
+        let azimuth = this.lightParameters.azimuth + Math.PI * 0.5;
         let elevation = this.lightParameters.elevation;
         let x = Math.cos(azimuth) * Math.cos(elevation);
         let y = Math.sin(elevation);
         let z = Math.sin(azimuth) * Math.cos(elevation);
 
-        this.lighPosition.x = x;
-        this.lighPosition.y = y;
-        this.lighPosition.z = z;
-
-        //this.lightsGroup.lookAt(this.lighPosition);
         var radius = 5.0;
-        this.lightsGroup.position.x =  this.lighPosition.x * radius;
-        this.lightsGroup.position.y =  this.lighPosition.y * radius;
-        this.lightsGroup.position.z =  this.lighPosition.z * radius;
+        this.lighPosition.x = x * radius;
+        this.lighPosition.y = y * radius;
+        this.lighPosition.z = z * radius;
 
-        if (this.material != null )
-        {
+        this.lightsGroup.position.x = this.lighPosition.x;
+        this.lightsGroup.position.y = this.lighPosition.y;
+        this.lightsGroup.position.z = this.lighPosition.z;
+
+        if (this.material != null) {
             this.material.uniforms.lightPosition.value = this.lighPosition;
+            this.material.uniforms.projection.value = this.camera.projectionMatrix;
+            this.material.uniforms.view.value = this.camera.matrixWorldInverse;
         }
 
         /*
