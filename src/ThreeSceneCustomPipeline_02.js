@@ -251,14 +251,14 @@ class SceneCustomPipeline_02 extends React.Component {
             this.material.uniforms.view.value = this.camera.matrixWorldInverse;
         }
 
-        /*
+ 
         // Calculamos la dirección
         this.lightDirection.x = x;
         this.lightDirection.y = y;
         this.lightDirection.z = z;
         this.lightDirection = this.lightDirection.normalize();
         this.material.uniforms.lightDirection.value = this.lightDirection;
-
+       /*
         // Calculamos la posición de la luz en espacio de vista (view space)
         let pos = new THREE.Vector3(0.0);
         this.pointLight.getWorldPosition(pos);
