@@ -118,7 +118,7 @@ class SceneCustomPipeline_02 extends React.Component {
         // Test sphere
         const geometry = new THREE.SphereGeometry(2.5);
         this.sphere = new THREE.Mesh(geometry, this.material);
-        //this.scene.add(this.sphere);
+        this.scene.add(this.sphere);
     }
     createLights() {
         this.lightsGroup = new THREE.Group();

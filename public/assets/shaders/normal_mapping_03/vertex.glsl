@@ -43,11 +43,13 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 precision highp float;
 
-varying vec3 vNormal;           // Vertex normal
+
 varying vec2 vUv;               // UV coordinates for texturing
 varying vec3 vViewPosition;     // Vertex position in camera view space with inverted coordinates
 varying vec3 fPosition;         // Vertex position in camera view space
 
+/*
+varying vec3 vNormal;           // Vertex normal
 void main() {
 
     vUv = uv;
@@ -65,3 +67,22 @@ void main() {
     vNormal = normal * normalMatrix;
     //vNormal = normal;
 }
+*/
+uniform vec3 lightPosition;
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+
+void main() {
+    //vNormal = normalize(normalMatrix * normal);
+    vNormal = normalize(normal);
+
+    vec4 posWorldSpace = (modelMatrix) * vec4(position, 1.0) ;
+    vLightRay = lightPosition - posWorldSpace.xyz;
+
+    vec4 vertexPositionCameraSpace = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * vertexPositionCameraSpace;
+}
+
+
+
