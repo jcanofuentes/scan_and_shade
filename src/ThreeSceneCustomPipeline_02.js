@@ -226,11 +226,7 @@ class SceneCustomPipeline_02 extends React.Component {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
 
-
-        //this.lightsGroup.rotation.x = this.lightParameters.elevation;
-        //this.lightsGroup.rotation.y = this.lightParameters.azimuth;
-
-        let azimuth = this.lightParameters.azimuth + Math.PI * 0.5;
+        let azimuth = Math.PI - ( this.lightParameters.azimuth + Math.PI * 0.5);
         let elevation = this.lightParameters.elevation;
         let x = Math.cos(azimuth) * Math.cos(elevation);
         let y = Math.sin(elevation);
