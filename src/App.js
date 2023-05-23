@@ -15,8 +15,8 @@ function App() {
 
       {
       <ThreeSceneCustomPipeline_02
-        vertexShaderFile='/assets/shaders/normal_mapping_03/vertex.glsl'
-        fragmentShaderFile='/assets/shaders/normal_mapping_03/fragment.glsl'
+        vertexShaderFile='/assets/shaders/normal_mapping_04/vertex.glsl'
+        fragmentShaderFile='/assets/shaders/normal_mapping_04/fragment.glsl'
       />}
 
       {/* CLOSE...!
