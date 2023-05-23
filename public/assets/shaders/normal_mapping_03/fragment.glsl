@@ -32,11 +32,17 @@ vec3 diffuseColor = vec3(0.55f);
 
 varying vec3 vLightRay;
 
+uniform sampler2D texNormal;    // Normal texture
+
 void main() {
     vec3 lightDirection = normalize(vLightRay);
 
+    //vec3 normalMap = texture2D(texNormal, vUv).xyz;
+    
     float lambertian = max(dot(vNormal, lightDirection), 0.0);
-    vec3 color = vec3(1.0, 0.0, 0.0);
+    vec3 color = vec3(0.29f, 0.65f, 0.2f);
+
+
 
     gl_FragColor = vec4(color * lambertian, 1.0);
 }
