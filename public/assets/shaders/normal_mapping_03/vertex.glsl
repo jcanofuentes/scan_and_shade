@@ -43,10 +43,11 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 precision highp float;
 
+uniform vec3 lightPosition;
+
 varying vec2 vUv;               // UV coordinates for texturing
 varying vec3 vNormal;
 varying vec3 vViewPosition;     // Vertex position in camera view space with inverted coordinates
-uniform vec3 lightPosition;
 varying vec3 vLightRay;
 
 void main() {
