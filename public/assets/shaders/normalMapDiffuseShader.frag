@@ -1,14 +1,11 @@
 varying vec2 vUv;
-
 varying vec3 vViewPosition;
 varying vec3 vNormal;
+varying vec3 vLightDirection;
 
 uniform sampler2D normalMap;
 uniform vec2 normalScale;
 
-varying vec3 vLightPosition;
-varying vec3 vWorldPosition;
-varying vec3 modelSpacePosition;
 vec3 perturbNormal2Arb(vec3 eye_pos, vec3 surf_norm, vec3 mapN) {
     vec3 q0 = vec3(dFdx(eye_pos.x), dFdx(eye_pos.y), dFdx(eye_pos.z));
     vec3 q1 = vec3(dFdy(eye_pos.x), dFdy(eye_pos.y), dFdy(eye_pos.z));
@@ -24,27 +21,17 @@ vec3 perturbNormal2Arb(vec3 eye_pos, vec3 surf_norm, vec3 mapN) {
 }
 
 void main() {
-
     vec3 normal = normalize(vNormal);
     vec3 geometryNormal = normal;
-
     vec3 mapN = texture2D(normalMap, vUv).xyz * 2.0 - 1.0;
+    mapN.y = -1.0 * mapN.y;
     mapN.xy *= normalScale;
+    mapN = normalize(mapN);
     normal = perturbNormal2Arb(-vViewPosition, normal, mapN);
-
-    //gl_FragColor = vec4(normal.xyz,1.0);
-
-
-    vec3 l_dir = vLightPosition - modelSpacePosition;
-
-    // set the specular term to black
-    vec4 spec = vec4(0.2);
-    // normalize both input vectors
+    vec3 l_dir = vLightDirection;
     vec3 n = normalize(normal);
     vec3 e = normalize(vViewPosition);
     vec3 l = normalize(l_dir);
-    float intensity = max(dot(normal,l), 0.0);
- 
-
-   gl_FragColor = vec4(intensity,intensity,intensity,1.0);
+    float intensity = max(dot(normal, l), 0.0);
+    gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
 }

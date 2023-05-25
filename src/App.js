@@ -13,11 +13,11 @@ function App() {
       <ThreeSceneStandardPipeline />
       */}
 
-      {
+      {/*
       <ThreeSceneCustomPipeline_02
         vertexShaderFile='/assets/shaders/normal_mapping_04/vertex.glsl'
         fragmentShaderFile='/assets/shaders/normal_mapping_04/fragment.glsl'
-      />}
+      />*/}
 
       {/* CLOSE...!
 
@@ -34,12 +34,12 @@ function App() {
       />
       */}
 
-      {/*   ADVANCED SHADERS USING LIGHT POSITION
+      {
       <ThreeSceneCustomPipeline
-        vertexShaderFile='/assets/shaders/normal_mapping/v_normal_mapping.glsl'
-        fragmentShaderFile='/assets/shaders/normal_mapping/f_normal_mapping.glsl'
+        vertexShaderFile='/assets/shaders/normalMapDiffuseShader.vert'
+        fragmentShaderFile='/assets/shaders/normalMapDiffuseShader.frag'
       />
-      */}
+      }
 
     </div>
 
