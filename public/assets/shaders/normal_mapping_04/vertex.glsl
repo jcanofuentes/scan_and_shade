@@ -25,6 +25,7 @@
 //
 // uniform bool isOrthographic;     A boolean value indicating whether the camera is using an orthographic projection (true)
 //                                  or a perspective projection (false).
+//
 // -----------------------------------------------------------------------------------------------------------------------------
 // default vertex attributes
 // -----------------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,7 @@
 // attribute vec2 uv;               The attribute representing the texture coordinates (UV coordinates) of a vertex, used for
 //                                  mapping textures onto the surface of a 3D model (provided by BufferGeometry)
 //
+//
 // Chain of transformations while working with normal mapping
 //
 // Tangent Space <-> Model (local) Space <-> World Space <-> View Space (eye or camera space) <-> Clip Space
@@ -41,17 +43,20 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 precision highp float;
 
-uniform vec3 lightPosition;
+uniform vec3 lightPosition; // Position of the light in world space. This is a uniform, so its value is constant across all vertices.
 
-varying vec2 vUv;               // UV coordinates for texturing
-varying vec3 vNormal;
-varying vec3 vViewPosition;     // Vertex position in camera view space with inverted coordinates
-varying vec3 vLightRay;
+varying vec2 vUv;           // UV coordinates for texturing. These are 2D coordinates that are used for mapping textures onto geometry.
+varying vec3 vNormal;       // Vertex normal vector, transformed to camera space using the normalMatrix.
+varying vec3 vViewPosition; // Vertex position in camera view space with inverted coordinates. This is the vertex position transformed by the modelViewMatrix, and then inverted.
+varying vec3 vLightRay;     // Vector from the vertex position to the light position, both in camera space.
 
 void main() {
     vNormal = normalize(normalMatrix * normal);
+    // Transforms the vertex position to camera space
     vec4 vertexPositionCameraSpace = modelViewMatrix * vec4(position, 1.0);
+    // Transforms the light position to camera space
     vec4 lightPositionCameraSpace = modelViewMatrix * vec4(lightPosition, 1.0);
+   // Calculates the vector from the vertex to the light in camera space. This will be interpolated in the fragment shader to approximate the direction from each fragment to the light.
     vLightRay = lightPositionCameraSpace.xyz - vertexPositionCameraSpace.xyz;
     gl_Position = projectionMatrix * vertexPositionCameraSpace;
     vUv = uv;

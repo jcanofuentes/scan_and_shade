@@ -11,6 +11,30 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 precision highp float;
 
+mat3 cotangentFrame_8_1(vec3 N, vec3 p, vec2 uv) {  
+    // get edge vectors of the pixel triangle 
+    vec3 dp1 = dFdx(p);
+    vec3 dp2 = dFdy(p);
+    vec2 duv1 = dFdx(uv);
+    vec2 duv2 = dFdy(uv);  
+    // solve the linear system  
+    vec3 dp2perp = cross(dp2, N);
+    vec3 dp1perp = cross(N, dp1);
+    vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
+    vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;  
+    // construct a scale-invariant frame   
+    float invmax = 1.0 / sqrt(max(dot(T, T), dot(B, B)));
+    return mat3(T * invmax, B * invmax, N);
+}
+vec3 perturb_4_2(vec3 map, vec3 N, vec3 V, vec2 texcoord) {
+    mat3 TBN = cotangentFrame_8_1(N, -V, texcoord);
+    return normalize(TBN * map);
+}
+
+vec4 getTexture(sampler2D uTex, vec2 uv) {
+    return texture2D(uTex, uv);
+}
+
 varying vec3 vNormal;           // Fragment normal (interpolated per-vertex)
 varying vec2 vUv;               // Fragment UV coordinates (interpolated per-vertex)
 varying vec3 vViewPosition;     // Fragment position in camera view space, with inverted coordinates (interpolated per-vertex)
@@ -21,103 +45,136 @@ uniform float iTime;
 uniform float iTimeDelta;
 
 uniform vec3 lightColor;        // Color of the light source
-uniform vec3 lightAmbient;      // Ambient color of the light source
+uniform vec3 ambientColor;      // Ambient color of the light source
 uniform float lightFalloff;     // Fallof of the light source
 uniform float lightRadius;      // Radius of the light source
 
 uniform sampler2D texDiffuse;   // Diffuse texture
 uniform sampler2D texNormal;    // Normal texture
 
+uniform bool useDiffuseTexture;
+
+uniform float material_param_0;
+uniform float material_param_1;
+uniform float material_param_2;
+uniform float material_param_3;
+
+uniform float material_param_4;
+
+uniform float param_2;// 1.0 - 0 a 10
+uniform float param_3;// 0.09 - 1.0
+uniform float param_4;// 0.032 - 
+uniform float param_5;
+uniform float param_6;
+uniform float param_7;
+
+varying vec3 vVertexPosition;   // Vertex position in camera space
+varying vec3 vLightPosition;    // Light position in camera space
+
+float calculateLambertian(vec3 normalDir, vec3 lightDir) {
+    return max(dot(normalDir, normalize(lightDir)), 0.0);
+}
+
+float calculateSpecular(vec3 lightDir, vec3 viewDir, vec3 normal, float shininess) {
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float specularIntensity = max(dot(reflectDir, viewDir), 0.0);
+    specularIntensity = pow(specularIntensity, shininess);
+    return specularIntensity;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------
 // LIGHT ATTENUATION
 //--------------------------------------------------------------------------------------------------------------------------------
-float attenuation_1_5(float r, float f, float d) {
-    float denom = d / r + 1.0;
+float attenuation_1_5(float radius, float falloff, float distance) {
+    float denom = distance / radius + 1.0;
     float attenuation = 1.0 / (denom * denom);
-    float t = (attenuation - f) / (1.0 - f);
+    float t = (attenuation - falloff) / (1.0 - falloff);
     return max(t, 0.0);
 }
-//--------------------------------------------------------------------------------------------------------------------------------
-// GAMMA CORRECTION
-//--------------------------------------------------------------------------------------------------------------------------------
-const float gamma_2_6 = 2.2;
-float toLinear_2_7(float v) {
-    return pow(v, gamma_2_6);
-}
-vec2 toLinear_2_7(vec2 v) {
-    return pow(v, vec2(gamma_2_6));
-}
-vec3 toLinear_2_7(vec3 v) {
-    return pow(v, vec3(gamma_2_6));
-}
-vec4 toLinear_2_7(vec4 v) {
-    return vec4(toLinear_2_7(v.rgb), v.a);
-}
-const float gamma_3_8 = 2.2;
-float toGamma_3_9(float v) {
-    return pow(v, 1.0 / gamma_3_8);
-}
-vec2 toGamma_3_9(vec2 v) {
-    return pow(v, vec2(1.0 / gamma_3_8));
-}
-vec3 toGamma_3_9(vec3 v) {
-    return pow(v, vec3(1.0 / gamma_3_8));
-}
-vec4 toGamma_3_9(vec4 v) {
-    return vec4(toGamma_3_9(v.rgb), v.a);
-}
-// Account for gamma-corrected images
-vec4 textureLinear(sampler2D uTex, vec2 uv) {
-    return toLinear_2_7(texture2D(uTex, uv));
-}
-void main() {
-    /*
-    vec3 lightDirection = normalize(vLightRay);
-    float lambertian = max(dot(vNormal, lightDirection), 0.0);
-    vec3 color = vec3(0.2f, 0.4f, 0.65f);
-    gl_FragColor = vec4(color * lambertian, 1.0);
-    */
 
+float calculateSimpleAttenuation(float distance, float dmax) {
+    return (1.0 - min(distance / dmax, 1.0)) * (1.0 - min(distance / dmax, 1.0));
+}
+
+float calculateLinearAttenuation(float distance, float constant, float linear, float quadratic) {
+    // Compute the attenuation factor using the linear attenuation formula
+    float attenuation = 1.0 / (constant + linear * distance + quadratic * distance * distance);
+
+    // Clamp the attenuation factor to [0, 1] range
+    attenuation = clamp(attenuation, 0.0, 1.0);
+
+    return attenuation;
+}
+
+void main() {
+    float shininess = material_param_1;
+    float specularScale = material_param_2;
+    float specularStrength = material_param_3;
+
+    // Set colors
+    vec3 diffuseColor = vec3(0.6, 0.6f, 0.6f);
+    vec3 specularColor = vec3(1.0f);
+
+    // Setup light direction and eye direction
+    vec3 L = normalize(vLightRay);
+    vec3 V = normalize(vViewPosition);
+
+    // Get vertex normal
     vec3 normal = vNormal;
 
-    // Get lightVector, it is surface to light direction
-    vec3 lightVector = normalize(vLightRay);
-    vec3 color = vec3(0.0);
-
-    // Calculate attenuation  
-    float lightDistance = length(lightVector);
-    float falloff = attenuation_1_5(lightRadius, lightFalloff, lightDistance);
-
-    // Now sample our texture. Assume its in sRGB, so we need to correct for gamma  
+    // Get textures
     vec2 uv = vUv;
-    vec3 diffuseColor = textureLinear(texDiffuse, uv).rgb;
-    vec3 normalMap = textureLinear(texNormal, uv).rgb * 2.0 - 1.0;
-    float specularStrength = 0.5; //textureLinear(texSpecular, uv).r;
+    if(useDiffuseTexture)
+        diffuseColor = getTexture(texDiffuse, uv).rgb;
 
-    //gl_FragColor = vec4(normalMap.xyz, 1.0);
+    vec3 normalMap = getTexture(texNormal, uv).rgb;
+    normalMap = normalMap * 2.0 - 1.0;
 
-    vec3 L = normalize(lightVector);                 // Light direction 
-    vec3 V = normalize(vViewPosition);               // Eye direction  
+    normalMap = normalize(normalMap);
+    normalMap.x *= material_param_4;
+    normalMap.y *= material_param_4;
 
-    gl_FragColor = vec4(normalMap.xyz, 1.0);
+    normalMap = normalize(normalMap);
+
+    // Compute final normal (vertex + normal map)
+    vec3 N = perturb_4_2(normalMap, normal, -V, uv);  // Surface normal  
+
+    // Compute diffuse and specular values
+    float diff = calculateLambertian(N, L);
+    float spec = calculateSpecular(L, V, N, shininess);
+
+    // Compute light attenuation (linear eq.)
+    float distance = length(vLightRay);   // Distance from light to fragment
+    float constant = param_2;   // 1.0 - 0 a 10
+    float linear = param_3;     // 0.09 - 1.0
+    float quadratic = param_4;    // 0.032 - 
+    float falloff = calculateLinearAttenuation(distance, constant, linear, quadratic);
 
     /*
-    vec3 N = perturb_4_2(normalMap, normal,  -V, uv);  // Surface normal  
-    //N = normalMap;
-    float specular = specularStrength * phongSpecular_6_4(L, V, N, shininess) * specularScale * falloff;
-    float diffValue = orenNayarDiffuse_7_3(L, V, N, roughness, albedo);
-    float diffValueWithFalloff = diffValue * falloff;
-    gl_FragColor.rgb = vec3(diffValue);
+    // Compute light attenuation (two-params version)
+    float distance = length(vLightRay);
+    float lRadius = param_5;
+    float lFalloff = param_6;
+    float falloff = attenuation_1_5(lRadius, lFalloff, distance);
 
-    vec3 diffuse = lightColor * diffValueWithFalloff;
-    vec3 ambient = lightAmbient;  
+    
+    // Compute light attenuation (one-param version)
+    float distance = length(vLightRay);
+    float maxDistance = param_7;
+    float falloff = calculateSimpleAttenuation(distance, maxDistance);
+     */   
+
+    // Compute new diffuse and specular values with attenuation
+    float specAtten = specularStrength * spec * specularScale * falloff;  // specularStrength could be defined using a map
+    float diffAtten = diff * falloff;
+
+    vec3 ambient = ambientColor;
+    vec3 diffuse = lightColor * diffAtten;
 
     // Add the lighting 
-    color += diffuseColor * (diffuse + ambient) + specular;  
+    vec3 color = vec3(0);
+    color += diffuseColor * (diffuse + ambient) + specAtten;
 
-    // Re-apply gamma to output buffer 
-    color = toGamma_3_9(color);
     gl_FragColor.rgb = vec3(color);
     gl_FragColor.a = 1.0;
-    */
 }
