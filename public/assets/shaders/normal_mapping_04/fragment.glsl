@@ -178,3 +178,16 @@ void main() {
     gl_FragColor.rgb = vec3(color);
     gl_FragColor.a = 1.0;
 }
+
+
+/*
+    float Ka = 0.0;   // Ambient reflection coefficient
+    float Kd = 0.7;   // Diffuse reflection coefficient
+    float Ks = 0.35;   // Specular reflection coefficient
+    vec3 ambientColor = vec3(0.0f, 0.0f, 0.0f);
+    vec3 diffuseColor = vec3(0.55f);
+    vec3 specularColor = vec3(1.0f);
+    vec3 a = Ka * ambientColor;
+    vec3 d = Kd * lambertian * diffuseColor;
+    vec3 s = Ks * specular * specularColor;
+*/

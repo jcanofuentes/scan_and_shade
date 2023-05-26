@@ -4,16 +4,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import * as dat from 'dat.gui';
 
-class SceneCustomPipeline extends React.Component {
+class SceneShader_NormalMapDiffuse extends React.Component {
     constructor(props) {
         super(props);
-        console.log("Creating SceneCustomPipeline instance (inheriting from React.Component.)");
         this.vertexShaderFile = props.vertexShaderFile;
         this.fragmentShaderFile = props.fragmentShaderFile;
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
-
         this.lightsGroup = null;
         this.camera = null;
         this.orbitsControl = null;
@@ -29,9 +27,9 @@ class SceneCustomPipeline extends React.Component {
     loadTextures() {
         console.log("Loading textures...");
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
+        this.diffuseMap = this.textureLoader.load('/assets/maps/PS_Albedo_4096.png');
         this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/PS_Normal_4096.png');
+        this.normalMap = this.textureLoader.load('/assets/maps/PS_Normal_4096.png');
     }
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.loadManager);
@@ -208,7 +206,6 @@ class SceneCustomPipeline extends React.Component {
         this.loadShaders();
         window.addEventListener("resize", this.updateDimensions);
     }
-
     componentWillUnmount() {
         cancelAnimationFrame(this.frameId);
         // Check if this.renderer is defined before trying to access domElement
@@ -217,7 +214,6 @@ class SceneCustomPipeline extends React.Component {
         }
         window.removeEventListener("resize", this.updateDimensions);
     }
-
     render() {
         return (
             <div
@@ -226,7 +222,5 @@ class SceneCustomPipeline extends React.Component {
             />
         );
     }
-
 }
-
-export default SceneCustomPipeline;
+export default SceneShader_NormalMapDiffuse;

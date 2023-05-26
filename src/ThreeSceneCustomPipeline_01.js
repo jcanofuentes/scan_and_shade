@@ -25,9 +25,9 @@ class SceneCustomPipeline_01 extends React.Component {
     loadTextures() {
         console.log("Loading textures...");
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
+        this.diffuseMap = this.textureLoader.load('/assets/maps/PS_Albedo_4096.png');
         this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/PS_Normal_4096.png');
+        this.normalMap = this.textureLoader.load('/assets/maps/PS_Normal_4096.png');
     }
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.loadManager);

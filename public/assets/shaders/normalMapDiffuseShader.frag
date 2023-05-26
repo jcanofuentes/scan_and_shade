@@ -1,3 +1,11 @@
+#version 300 es
+#define varying in
+out highp vec4 pc_fragColor;
+#define gl_FragColor pc_fragColor
+#define texture2D texture
+precision highp float;
+precision highp int;
+
 varying vec2 vUv;
 varying vec3 vViewPosition;
 varying vec3 vNormal;
@@ -23,7 +31,7 @@ vec3 perturbNormal2Arb(vec3 eye_pos, vec3 surf_norm, vec3 mapN) {
 void main() {
     vec3 normal = normalize(vNormal);
     vec3 geometryNormal = normal;
-    vec3 mapN = texture2D(normalMap, vUv).xyz * 2.0 - 1.0;
+    vec3 mapN = texture(normalMap, vUv).xyz * 2.0 - 1.0;
     mapN.y = -1.0 * mapN.y;
     mapN.xy *= normalScale;
     mapN = normalize(mapN);

@@ -2,7 +2,7 @@ import React from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-class Scene extends React.Component {
+class SceneStandard_BasicTemplate extends React.Component {
     constructor(props) {
         super(props);
         console.log("Creating ThreeCanvas instance (inheriting from React.Component.)");
@@ -57,4 +57,4 @@ class Scene extends React.Component {
     }
 }
 
-export default Scene;
+export default SceneStandard_BasicTemplate;

@@ -45,3 +45,10 @@ FINAL COLOR
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 Our final color is going straight to the screen, so we should re-apply the gamma correction we removed earlier. If the color was going through 
 a post-processing pipeline, we could continue operating in linear space until the final step.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+THREEJS
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+https://github.com/delaneyj/three.net/blob/master/code/js/r68/src/renderers/shaders/ShaderChunk/normalmap_pars_fragment.glsl
+https://threejs.org/docs/#api/en/materials/MeshStandardMaterial.normalMap
+Params: .normalScale

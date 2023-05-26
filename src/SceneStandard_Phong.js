@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui';
 
-class SceneStandardPipeline extends React.Component {
+class SceneStandard_Phong extends React.Component {
     constructor(props) {
         super(props);
         console.log("Creating SceneStandardPipeline instance (inheriting from React.Component.)");
@@ -23,7 +23,7 @@ class SceneStandardPipeline extends React.Component {
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
         //this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
         //this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/PS_Normal_4096.png');
+        this.normalMap = this.textureLoader.load('/assets/maps/PS_Normal_4096.png');
     }
     createSceneAndRenderer() {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -174,20 +174,7 @@ class SceneStandardPipeline extends React.Component {
         );
     }
 
-    /*
-        render() {
-            return (
-                <div>
-                    <Joystick onChange={this.handleJoystickChange} />
-                    <div
-                        style={{ width: "100vw", height: "75vw" }}
-                        ref={ref => (this.mount = ref)}
-                    />
-                </div>
-            );
-        }
-    */
 
 }
 
-export default SceneStandardPipeline;
+export default SceneStandard_Phong;

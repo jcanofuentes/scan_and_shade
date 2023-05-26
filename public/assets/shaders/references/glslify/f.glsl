@@ -1,6 +1,5 @@
 
 // From: http://stack.gl/glsl-lighting-walkthrough/
-
 #define GLSLIFY 1
 #extension GL_OES_standard_derivatives : enable
 precision highp float;
