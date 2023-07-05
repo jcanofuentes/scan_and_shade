@@ -10,6 +10,10 @@ class SceneCustomPipeline extends React.Component {
         console.log("Creating SceneCustomPipeline instance (inheriting from React.Component.)");
         this.vertexShaderFile = props.vertexShaderFile;
         this.fragmentShaderFile = props.fragmentShaderFile;
+        
+        this.vertexShaderFile2 = props.vertexShaderFile;
+        this.fragmentShaderFile2 = props.fragmentShaderFile;
+        
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
@@ -44,6 +48,17 @@ class SceneCustomPipeline extends React.Component {
             console.log("Fragment shader loaded!");
             this.fragmentShader = data;
         });
+
+        this.vertexShaderLoader2 = new THREE.FileLoader(this.loadManager);
+        this.fragmentShaderLoader2 = new THREE.FileLoader(this.loadManager);
+        this.vertexShaderLoader2.load(this.vertexShaderFile, (data) => {
+            console.log("Vertex shader loaded!");
+            this.vertexShader2 = data;
+        });
+        this.fragmentShaderLoader2.load(this.fragmentShaderFile, (data) => {
+            console.log("Fragment shader loaded!");
+            this.fragmentShader2 = data;
+        });
     }
     createScene() {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -56,19 +71,48 @@ class SceneCustomPipeline extends React.Component {
                 normalMap: { value: this.normalMap },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
+                backgroundColour: { value: new THREE.Color(0.1,0.0,0.0) }
             }
         ]);
+
+        this.uniforms2 = THREE.UniformsUtils.merge([
+            THREE.UniformsLib.lights,
+            {
+                normalMap: { value: this.normalMap },
+                lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+                normalScale: { value: new THREE.Vector2(2.0, 2.0) },
+                backgroundColour: { value: new THREE.Color(0.0,0.1,0.0) }
+            }
+        ]);
+        
         this.material = new THREE.ShaderMaterial({
             uniforms: this.uniforms,
             vertexShader: this.vertexShader,
             fragmentShader: this.fragmentShader,
             lights: true
         });
+
+        this.material2 = new THREE.ShaderMaterial({
+            uniforms: this.uniforms2,
+            vertexShader: this.vertexShader2,
+            fragmentShader: this.fragmentShader2,
+            lights: true
+        });
+        
         var plane = new THREE.Mesh(
             new THREE.PlaneGeometry(10, 10, 1, 1),
             this.material
         );
+        
+        var plane2 = new THREE.Mesh(
+            new THREE.PlaneGeometry(10, 10, 1, 1),
+            this.material2
+        )
+        
+        plane2.position.set(10,0,0);
+        
         this.scene.add(plane);
+        this.scene.add(plane2);
     }
 
 
@@ -193,8 +237,12 @@ class SceneCustomPipeline extends React.Component {
         // Update shader uniforms
         let worldPosition = new THREE.Vector3();
         this.lightsGroup.getWorldPosition(worldPosition);
+        
         this.material.uniforms.lightPosition.value = worldPosition;
         this.material.uniforms.normalScale.value = new THREE.Vector2(this.shadingParams.vertical_Exaggeration, this.shadingParams.vertical_Exaggeration);
+
+        this.material2.uniforms.lightPosition.value = worldPosition;
+        this.material2.uniforms.normalScale.value = new THREE.Vector2(this.shadingParams.vertical_Exaggeration, this.shadingParams.vertical_Exaggeration);
 
         this.renderer.render(this.scene, this.camera);
     }
