@@ -5,7 +5,7 @@ varying vec2 vUv;
 
 // Custom
 uniform vec3 lightPosition;
-uniform vec3 lightOffset;
+varying vec3 lightOffset;
 varying vec3 vLightDirection;
 
 void main() {

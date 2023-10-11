@@ -70,7 +70,6 @@ class SceneCustomPipeline extends React.Component {
             {
                 normalMap: { value: this.normalMap },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
-                lightOffest: { value: new THREE.Vector3(0.0,0.0,0.0).normalize()},
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
                 backgroundColour: { value: new THREE.Color(0.1,0.0,0.0) }
             }
@@ -81,7 +80,6 @@ class SceneCustomPipeline extends React.Component {
             {
                 normalMap: { value: this.normalMap },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
-                lightOffest: { value: new THREE.Vector3(0.0,10,0.0).normalize()},
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
                 backgroundColour: { value: new THREE.Color(0.0,0.1,0.0) }
             }
