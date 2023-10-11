@@ -34,6 +34,6 @@ void main() {
     vec3 e = normalize(vViewPosition);
     vec3 l = normalize(l_dir);
     float intensity = max(dot(normal, l), 0.0);
-    //gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
-    gl_FragColor = vec4(backgroundColour.rgb, 1.0);
+    gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
+    //gl_FragColor = vec4(backgroundColour.rgb, 1.0);
 }

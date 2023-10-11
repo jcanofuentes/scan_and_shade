@@ -5,6 +5,7 @@ varying vec2 vUv;
 
 // Custom
 uniform vec3 lightPosition;
+uniform vec3 lightOffset;
 varying vec3 vLightDirection;
 
 void main() {
@@ -20,6 +21,7 @@ void main() {
     vec4 vertexPositionCameraSpace = modelViewMatrix * vec4(position, 1.0);
     // Transforms the light position to camera space
     vec4 lightPositionCameraSpace = modelViewMatrix * vec4(lightPosition, 1.0);
+    vec4 lightDirectionOffest = modelViewMatrix * vec4(lightOffset, 1.0);
     // Calculates the vector from the vertex to the light in camera space. This will be interpolated in the fragment shader to approximate the direction from each fragment to the light.
-    vLightDirection = lightPositionCameraSpace.xyz - vertexPositionCameraSpace.xyz;
+    vLightDirection = (lightPositionCameraSpace.xyz - vertexPositionCameraSpace.xyz) - lightDirectionOffest.xyz;
 }

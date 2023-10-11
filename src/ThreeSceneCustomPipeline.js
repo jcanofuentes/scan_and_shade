@@ -70,6 +70,7 @@ class SceneCustomPipeline extends React.Component {
             {
                 normalMap: { value: this.normalMap },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+                lightOffest: { value: new THREE.Vector3(0.0,0.0,0.0).normalize()},
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
                 backgroundColour: { value: new THREE.Color(0.1,0.0,0.0) }
             }
@@ -80,6 +81,7 @@ class SceneCustomPipeline extends React.Component {
             {
                 normalMap: { value: this.normalMap },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+                lightOffest: { value: new THREE.Vector3(0.0,10,0.0).normalize()},
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
                 backgroundColour: { value: new THREE.Color(0.0,0.1,0.0) }
             }
@@ -241,7 +243,11 @@ class SceneCustomPipeline extends React.Component {
         this.material.uniforms.lightPosition.value = worldPosition;
         this.material.uniforms.normalScale.value = new THREE.Vector2(this.shadingParams.vertical_Exaggeration, this.shadingParams.vertical_Exaggeration);
 
-        this.material2.uniforms.lightPosition.value = worldPosition;
+        let x_offset = this.material.uniforms.lightPosition.value.x;
+        let y_offset = this.material.uniforms.lightPosition.value.y;
+        let z_offset = this.material.uniforms.lightPosition.value.z;
+
+        this.material2.uniforms.lightPosition.value.set(x_offset, y_offset, z_offset);
         this.material2.uniforms.normalScale.value = new THREE.Vector2(this.shadingParams.vertical_Exaggeration, this.shadingParams.vertical_Exaggeration);
 
         this.renderer.render(this.scene, this.camera);
