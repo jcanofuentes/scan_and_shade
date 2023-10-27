@@ -42,10 +42,28 @@ class SceneCustomPipeline extends React.Component {
     }
     loadTextures() {
         console.log("Loading textures...");
+
+        this.normalMap = getMap(iiifResources, 'normal');
+        this.albedoMap = getMap(iiifResources, 'albedo');
+        this.maxTileLevel = data.tiles[0].scaleFactors.length - 1;
+        this.tileSets = getTileSets(
+            this.maxTileLevel,
+            data,
+            this.albedoMap,
+            this.normalMap
+
+        );
+        
+        console.log(this.tileSets);
+        
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/maps/PS_Albedo_4096.png');
-        this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/maps/PS_Normal_4096.png');
+        this.diffuseMap1 = this.textureLoader.load(this.tileSets[5].albedoTiles.urls[0]);
+        this.diffuseMap1.colorSpace = THREE.SRGBColorSpace;
+        this.normalMap1 = this.textureLoader.load(this.tileSets[5].normalTiles.urls[0]);
+
+        this.diffuseMap2 = this.textureLoader.load(this.tileSets[5].albedoTiles.urls[1]);
+        this.diffuseMap2.colorSpace = THREE.SRGBColorSpace;
+        this.normalMap2 = this.textureLoader.load(this.tileSets[5].normalTiles.urls[1]);
     }
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.loadManager);
@@ -78,7 +96,7 @@ class SceneCustomPipeline extends React.Component {
         this.uniforms = THREE.UniformsUtils.merge([
             THREE.UniformsLib.lights,
             {
-                normalMap: { value: this.normalMap },
+                normalMap: { value: this.normalMap1 },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
                 backgroundColour: { value: new THREE.Color(0.1,0.0,0.0) }
@@ -88,7 +106,7 @@ class SceneCustomPipeline extends React.Component {
         this.uniforms2 = THREE.UniformsUtils.merge([
             THREE.UniformsLib.lights,
             {
-                normalMap: { value: this.normalMap },
+                normalMap: { value: this.normalMap2 },
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
                 normalScale: { value: new THREE.Vector2(2.0, 2.0) },
                 backgroundColour: { value: new THREE.Color(0.0,0.1,0.0) }
@@ -232,20 +250,6 @@ class SceneCustomPipeline extends React.Component {
 
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
-
-        this.normalMap = getMap(iiifResources, 'normal');
-        this.albedoMap = getMap(iiifResources, 'albedo');
-        this.maxTileLevel = data.tiles[0].scaleFactors.length - 1;
-        this.tileSets = getTileSets(
-            this.maxTileLevel,
-            data,
-            this.albedoMap,
-            this.normalMap
-            
-        );
-
-        console.log(this.tileSets);
-
     }
     updateDimensions() {
         if (this.mount !== null) {
