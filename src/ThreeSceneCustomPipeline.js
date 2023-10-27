@@ -3,6 +3,9 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import * as dat from 'dat.gui';
+import data from './data/info.json';
+import iiifResources from './data/iiifResources.json';
+import { _parseTiles, getTileSets, getMap } from './RelightHelpers';
 
 class SceneCustomPipeline extends React.Component {
     constructor(props) {
@@ -22,6 +25,13 @@ class SceneCustomPipeline extends React.Component {
         this.camera = null;
         this.orbitsControl = null;
         this.transformControl = null;
+
+        this.id = _parseTiles(data, "@id");
+        this.width = _parseTiles(data, "width");
+        this.height = _parseTiles(data, "height");
+        this.tiles = _parseTiles(data, "tiles");
+        
+        
     }
     // ------------------------------------------------------------------------------
     // Custom methods for handling the Three.js scene:
@@ -33,9 +43,9 @@ class SceneCustomPipeline extends React.Component {
     loadTextures() {
         console.log("Loading textures...");
         this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
+        this.diffuseMap = this.textureLoader.load('/assets/maps/PS_Albedo_4096.png');
         this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/PS_Normal_4096.png');
+        this.normalMap = this.textureLoader.load('/assets/maps/PS_Normal_4096.png');
     }
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.loadManager);
@@ -222,6 +232,20 @@ class SceneCustomPipeline extends React.Component {
 
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
+
+        this.normalMap = getMap(iiifResources, 'normal');
+        this.albedoMap = getMap(iiifResources, 'albedo');
+        this.maxTileLevel = data.tiles[0].scaleFactors.length - 1;
+        this.tileSets = getTileSets(
+            this.maxTileLevel,
+            data,
+            this.albedoMap,
+            this.normalMap
+            
+        );
+
+        console.log(this.tileSets);
+
     }
     updateDimensions() {
         if (this.mount !== null) {

@@ -1,0 +1,167 @@
+[
+  {
+    "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/af3a9ef0-09e0-4eaa-b209-bf6160e414f1/full/max/0/default.jpg",
+    "__jsonld": {
+      "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/af3a9ef0-09e0-4eaa-b209-bf6160e414f1/full/max/0/default.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "label": {
+        "en": [
+          "Reverse [composite]"
+        ]
+      },
+      "width": 3208,
+      "height": 4260,
+      "service": [
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/af3a9ef0-09e0-4eaa-b209-bf6160e414f1",
+          "@type": "ImageService2",
+          "profile": "http://iiif.io/api/image/2/level1.json"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/af3a9ef0-09e0-4eaa-b209-bf6160e414f1",
+          "type": "ImageService3",
+          "profile": "level1"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/lightingmap/af3a9ef0-09e0-4eaa-b209-bf6160e414f1.json",
+          "type": "LightingMapExtension",
+          "profile": "http://iiif.io/api/extension/lightingmap",
+          "mapType": "composite"
+        }
+      ]
+    }
+  },
+  {
+    "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991/full/max/0/default.jpg",
+    "__jsonld": {
+      "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991/full/max/0/default.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "label": {
+        "en": [
+          "Reverse [albedo]"
+        ]
+      },
+      "width": 3208,
+      "height": 4260,
+      "service": [
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991",
+          "@type": "ImageService2",
+          "profile": "http://iiif.io/api/image/2/level1.json"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991",
+          "type": "ImageService3",
+          "profile": "level1"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/lightingmap/5f34d322-61d9-44a0-81a3-9422364fa991.json",
+          "type": "LightingMapExtension",
+          "profile": "http://iiif.io/api/extension/lightingmap",
+          "mapType": "albedo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/54f7a560-df98-4098-a3e0-1ae4341ad1b7/full/max/0/default.jpg",
+    "__jsonld": {
+      "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/54f7a560-df98-4098-a3e0-1ae4341ad1b7/full/max/0/default.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "label": {
+        "en": [
+          "Reverse [shaded render]"
+        ]
+      },
+      "width": 3208,
+      "height": 4260,
+      "service": [
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/54f7a560-df98-4098-a3e0-1ae4341ad1b7",
+          "@type": "ImageService2",
+          "profile": "http://iiif.io/api/image/2/level1.json"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/54f7a560-df98-4098-a3e0-1ae4341ad1b7",
+          "type": "ImageService3",
+          "profile": "level1"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/lightingmap/54f7a560-df98-4098-a3e0-1ae4341ad1b7.json",
+          "type": "LightingMapExtension",
+          "profile": "http://iiif.io/api/extension/lightingmap",
+          "mapType": "shaded"
+        }
+      ]
+    }
+  },
+  {
+    "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/787d33d9-6d08-4738-a1f9-a0cba2c29682/full/max/0/default.jpg",
+    "__jsonld": {
+      "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/787d33d9-6d08-4738-a1f9-a0cba2c29682/full/max/0/default.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "label": {
+        "en": [
+          "Reverse [depth map]"
+        ]
+      },
+      "width": 3208,
+      "height": 4260,
+      "service": [
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/787d33d9-6d08-4738-a1f9-a0cba2c29682",
+          "@type": "ImageService2",
+          "profile": "http://iiif.io/api/image/2/level1.json"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/787d33d9-6d08-4738-a1f9-a0cba2c29682",
+          "type": "ImageService3",
+          "profile": "level1"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/lightingmap/787d33d9-6d08-4738-a1f9-a0cba2c29682.json",
+          "type": "LightingMapExtension",
+          "profile": "http://iiif.io/api/extension/lightingmap",
+          "mapType": "depth"
+        }
+      ]
+    }
+  },
+  {
+    "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/a469e838-9448-4d99-bcac-d35868cb5e1f/full/max/0/default.jpg",
+    "__jsonld": {
+      "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/a469e838-9448-4d99-bcac-d35868cb5e1f/full/max/0/default.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "label": {
+        "en": [
+          "Reverse [normal map]"
+        ]
+      },
+      "width": 3208,
+      "height": 4260,
+      "service": [
+        {
+          "@id": "https://iiif.bodleian.ox.ac.uk/iiif/image/a469e838-9448-4d99-bcac-d35868cb5e1f",
+          "@type": "ImageService2",
+          "profile": "http://iiif.io/api/image/2/level1.json"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/a469e838-9448-4d99-bcac-d35868cb5e1f",
+          "type": "ImageService3",
+          "profile": "level1"
+        },
+        {
+          "id": "https://iiif.bodleian.ox.ac.uk/iiif/image/lightingmap/a469e838-9448-4d99-bcac-d35868cb5e1f.json",
+          "type": "LightingMapExtension",
+          "profile": "http://iiif.io/api/extension/lightingmap",
+          "mapType": "normal"
+        }
+      ]
+    }
+  }
+]
