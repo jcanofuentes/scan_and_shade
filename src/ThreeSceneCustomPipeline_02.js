@@ -12,7 +12,7 @@ class CustomAnimator extends EventTarget {
     constructor() {
         super();
     };
-    update(){
+    update() {
         this.angle += this.deltaAngle;
         this.pos.x = Math.sin(this.angle) * this.distance;
         this.pos.y = Math.cos(this.angle) * this.distance;
@@ -45,6 +45,8 @@ class SceneCustomPipeline_02 extends React.Component {
         this.lightAnimator = new CustomAnimator();
 
         this.useDiffuseTexture = true;
+
+        this.animateLights = false;
     }
     // ------------------------------------------------------------------------------
     // Custom methods for handling the Three.js scene:
@@ -115,7 +117,7 @@ class SceneCustomPipeline_02 extends React.Component {
                 lightPosition: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
                 lightColor: { value: new THREE.Color(1, 1, 1) },
 
-                
+
                 ambientColor: { value: new THREE.Color(0.08, 0.08, 0.15) },
 
                 lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
@@ -153,13 +155,20 @@ class SceneCustomPipeline_02 extends React.Component {
         );
         this.scene.add(plane);
 
+        var secondPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(10, 10, 1, 1),
+            this.material
+        );
+        secondPlane.position.x = 12;
+        this.scene.add(secondPlane);
+
         // Test sphere
         const geometry = new THREE.SphereGeometry(2.5);
         this.sphere = new THREE.Mesh(geometry, this.material);
-        this.scene.add(this.sphere);
+        //this.scene.add(this.sphere);
 
         this.material_red = new THREE.MeshBasicMaterial();
-        this.material_red.color = new THREE.Color(255.0,0.0,0.0);
+        this.material_red.color = new THREE.Color(255.0, 0.0, 0.0);
         this.animator = new THREE.Mesh(geometry, this.material_red);
         this.animator.scale.setScalar(0.1);
         //this.scene.add(this.animator);
@@ -219,15 +228,9 @@ class SceneCustomPipeline_02 extends React.Component {
         // Choose between directional o point lights
         guiLightsGroup.add(options, 'toggle').name('Point / Directional').onChange((value) => {
             if (value) {
-                this.dirLight.visible = true;
-                this.dirHelper.visible = true;
-                this.pointLight.visible = false;
-                this.pointLightHelper.visible = false;
+                this.animateLights = true;
             } else {
-                this.dirLight.visible = false;
-                this.dirHelper.visible = false;
-                this.pointLight.visible = true;
-                this.pointLightHelper.visible = true;
+                this.animateLights = false;
             }
         });
 
@@ -243,18 +246,18 @@ class SceneCustomPipeline_02 extends React.Component {
             } else {
                 this.useDiffuseTexture = false;
             }
-        });   
+        });
 
         this.material_param_0 = 0.15; // 0.15 - Range (0.0 - 1.0)
         this.material_param_1 = 32.0; // 1.00 - Range (0.0 - 40.0)
         this.material_param_2 = 0.65; // 0.65 - Range (0.0 - 2.0)
         this.material_param_3 = 0.50; // 0.50 - Range (0.0, 1.0)
         this.material_param_4 = 1.00; // 0.50 - Range (0.0, 4.0)
-        guiMaterialGroup.add(this, 'material_param_0',0.10,1.0).step(0.05).name('ambient').listen();
-        guiMaterialGroup.add(this, 'material_param_1',0.1,120.0).step(0.05).name('shininess').listen();
-        guiMaterialGroup.add(this, 'material_param_2',0.0,32.0).step(0.05).name('specularScale').listen();
-        guiMaterialGroup.add(this, 'material_param_3',0.0,2.0).step(0.05).name('specularStrength').listen();
-        guiMaterialGroup.add(this, 'material_param_4',0.0,4.0).step(0.05).name('normalStrength').listen();
+        guiMaterialGroup.add(this, 'material_param_0', 0.10, 1.0).step(0.05).name('ambient').listen();
+        guiMaterialGroup.add(this, 'material_param_1', 0.1, 120.0).step(0.05).name('shininess').listen();
+        guiMaterialGroup.add(this, 'material_param_2', 0.0, 32.0).step(0.05).name('specularScale').listen();
+        guiMaterialGroup.add(this, 'material_param_3', 0.0, 2.0).step(0.05).name('specularStrength').listen();
+        guiMaterialGroup.add(this, 'material_param_4', 0.0, 4.0).step(0.05).name('normalStrength').listen();
 
         guiMaterialGroup.open();
 
@@ -265,13 +268,13 @@ class SceneCustomPipeline_02 extends React.Component {
         this.param_5 = 5.0;
         this.param_6 = 0.001;
         this.param_7 = 5.0;
-        guiAttGroup.add(this, 'param_2',0.0,10.0).step(0.05).name('att_1_const').listen();
-        guiAttGroup.add(this, 'param_3',0.0,1.0).step(0.01).name('att_1_lin').listen();
-        guiAttGroup.add(this, 'param_4',0.0,1.0).step(0.005).name('att_1_quad').listen();
-        guiAttGroup.add(this, 'param_5',0.0,10.0).step(0.05).name('att_2_radius').listen();
-        guiAttGroup.add(this, 'param_6',0.001,0.25).step(0.001).name('att_2_falloff').listen();
-        guiAttGroup.add(this, 'param_7',0.0,10.0).step(0.05).name('att_3_max_d').listen();
-        
+        guiAttGroup.add(this, 'param_2', 0.0, 10.0).step(0.05).name('att_1_const').listen();
+        guiAttGroup.add(this, 'param_3', 0.0, 1.0).step(0.01).name('att_1_lin').listen();
+        guiAttGroup.add(this, 'param_4', 0.0, 1.0).step(0.005).name('att_1_quad').listen();
+        guiAttGroup.add(this, 'param_5', 0.0, 10.0).step(0.05).name('att_2_radius').listen();
+        guiAttGroup.add(this, 'param_6', 0.001, 0.25).step(0.001).name('att_2_falloff').listen();
+        guiAttGroup.add(this, 'param_7', 0.0, 10.0).step(0.05).name('att_3_max_d').listen();
+
         guiAttGroup.open();
 
 
@@ -305,7 +308,7 @@ class SceneCustomPipeline_02 extends React.Component {
 
         this.frameCount++;
 
-                
+
         let azimuth = Math.PI - (this.lightParameters.azimuth + Math.PI * 0.5);
         let elevation = this.lightParameters.elevation;
         let x = Math.cos(azimuth) * Math.cos(elevation);
@@ -317,18 +320,16 @@ class SceneCustomPipeline_02 extends React.Component {
         this.lighPosition.x = x * radius;
         this.lighPosition.y = y * radius;
         this.lighPosition.z = z * radius;
-        
 
-
+        /*
         this.lightAnimator.update();
         this.animator.position.x = this.lightAnimator.pos.x;
         this.animator.position.y = this.lightAnimator.pos.y;
         this.animator.position.z = this.lightAnimator.pos.z;
-
         this.lighPosition.x = this.lightAnimator.pos.x;
         this.lighPosition.y = this.lightAnimator.pos.y;
         this.lighPosition.z = this.lightAnimator.pos.z;
-
+        */
 
         this.lightsGroup.position.x = this.lighPosition.x;
         this.lightsGroup.position.y = this.lighPosition.y;
@@ -339,11 +340,11 @@ class SceneCustomPipeline_02 extends React.Component {
             //this.material.uniforms.projection.value = this.camera.projectionMatrix;
             //this.material.uniforms.view.value = this.camera.matrixWorldInverse;
 
-            this.material.uniforms.ambientColor.value =  new THREE.Color(this.material_param_0,this.material_param_0,this.material_param_0);
-            this.material.uniforms.material_param_1.value =  this.material_param_1;
-            this.material.uniforms.material_param_2.value =  this.material_param_2;
-            this.material.uniforms.material_param_3.value =  this.material_param_3;
-            this.material.uniforms.material_param_4.value =  this.material_param_4;
+            this.material.uniforms.ambientColor.value = new THREE.Color(this.material_param_0, this.material_param_0, this.material_param_0);
+            this.material.uniforms.material_param_1.value = this.material_param_1;
+            this.material.uniforms.material_param_2.value = this.material_param_2;
+            this.material.uniforms.material_param_3.value = this.material_param_3;
+            this.material.uniforms.material_param_4.value = this.material_param_4;
 
             this.material.uniforms.useDiffuseTexture.value = this.useDiffuseTexture;
 
@@ -375,17 +376,17 @@ class SceneCustomPipeline_02 extends React.Component {
 
         //let lighPos = THREE.Vector3(Math.sin(this.clock.getElapsedTime() * 1.0) * 20.0, 0.0, Math.cos(this.clock.getElapsedTime() * 1.0) * 20.0);
 
-        /*
-        // Animacion
-        var lightHeight = 2.0;
-        var lightPathDiameter = 3.0;
-        var lightPathAnimationSpeed = 0.5;
-        this.lighPosition.z = lightHeight;
-        this.lighPosition.x = Math.sin(this.clock.getElapsedTime() * lightPathAnimationSpeed) * lightPathDiameter;
-        this.lighPosition.y = Math.cos(this.clock.getElapsedTime() * lightPathAnimationSpeed) * lightPathDiameter;
-        this.material.uniforms.lightPosition.value = this.lighPosition;
-        this.lightsGroup.lookAt(this.lighPosition);
-        */
+        if (this.animateLights) {
+            // Animacion
+            var lightHeight = 2.0;
+            var lightPathDiameter = 3.0;
+            var lightPathAnimationSpeed = 0.5;
+            this.lighPosition.z = lightHeight;
+            this.lighPosition.x = Math.sin(this.clock.getElapsedTime() * lightPathAnimationSpeed) * lightPathDiameter;
+            this.lighPosition.y = Math.cos(this.clock.getElapsedTime() * lightPathAnimationSpeed) * lightPathDiameter;
+            this.material.uniforms.lightPosition.value = this.lighPosition;
+            this.lightsGroup.lookAt(this.lighPosition);
+        }
 
         // Shader toy compatibility...
         this.material.uniforms.iResolution.value = this.iResolution;

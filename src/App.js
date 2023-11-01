@@ -10,34 +10,44 @@ function App() {
   return (
     <div className="App">
       {
-      /*
-      {
-        <SceneStandard_BasicTemplate />
+        /*
+        {
+          <SceneStandard_BasicTemplate />
+        }
+        {
+          <SceneStandard_Phong />
+        }
+        {
+          <SceneShader_NormalMapDiffuse
+            vertexShaderFile='/assets/shaders/normalMapDiffuseShader.vert'
+            fragmentShaderFile='/assets/shaders/normalMapDiffuseShader.frag'
+          />
+        }
+        */
       }
-      {
-        <SceneStandard_Phong />
-      }
+
+
+      {/*
+        <ThreeSceneCustomPipeline_01
+          vertexShaderFile='/assets/shaders/normal_mapping_01/vertex.glsl'
+          fragmentShaderFile='/assets/shaders/normal_mapping_01/fragment.glsl'
+        />
+      */}
       {
         <SceneShader_NormalMapDiffuse
           vertexShaderFile='/assets/shaders/normalMapDiffuseShader.vert'
           fragmentShaderFile='/assets/shaders/normalMapDiffuseShader.frag'
         />
       }
-      */
-      }
-      {/*
-      <ThreeSceneCustomPipeline_02
-        vertexShaderFile='/assets/shaders/normal_mapping_04/vertex.glsl'
-        fragmentShaderFile='/assets/shaders/normal_mapping_04/fragment.glsl'
-      />*/}
 
       {
-
-      <ThreeSceneCustomPipeline_01
-        vertexShaderFile='/assets/shaders/normal_mapping_01/vertex.glsl'
-        fragmentShaderFile='/assets/shaders/normal_mapping_01/fragment.glsl'
-      />
+        <ThreeSceneCustomPipeline_02
+          vertexShaderFile='/assets/shaders/normal_mapping_04/vertex.glsl'
+          fragmentShaderFile='/assets/shaders/normal_mapping_04/fragment.glsl'
+        />
       }
+
+
 
     </div>
 

@@ -1,8 +1,3 @@
-#version 300 es
-#define varying in
-out highp vec4 pc_fragColor;
-#define gl_FragColor pc_fragColor
-#define texture2D texture
 precision highp float;
 precision highp int;
 
@@ -42,4 +37,9 @@ void main() {
     vec3 l = normalize(l_dir);
     float intensity = max(dot(normal, l), 0.0);
     gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
+
+    //gl_FragColor = vec4(l_dir * 0.5 + 0.5, 1.0);
+
+    //vec4 col = vec4(abs(vViewPosition), 1.0);
+    //gl_FragColor = col;
 }

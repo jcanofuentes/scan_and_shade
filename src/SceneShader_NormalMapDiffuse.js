@@ -62,11 +62,19 @@ class SceneShader_NormalMapDiffuse extends React.Component {
             fragmentShader: this.fragmentShader,
             lights: true
         });
-        var plane = new THREE.Mesh(
+        this.plane = new THREE.Mesh(
             new THREE.PlaneGeometry(10, 10, 1, 1),
             this.material
         );
-        this.scene.add(plane);
+        this.scene.add(this.plane);
+
+            // Crear y añadir el segundo plano
+        this.secondPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(10, 10, 1, 1),
+            this.material
+        );
+        this.secondPlane.position.x = 12; // Apply x-offset
+        this.scene.add(this.secondPlane);
     }
 
 
@@ -193,6 +201,15 @@ class SceneShader_NormalMapDiffuse extends React.Component {
         this.lightsGroup.getWorldPosition(worldPosition);
         this.material.uniforms.lightPosition.value = worldPosition;
         this.material.uniforms.normalScale.value = new THREE.Vector2(this.shadingParams.vertical_Exaggeration, this.shadingParams.vertical_Exaggeration);
+
+        // Computar y imprimir modelViewMatrix para un plano específico
+        let modelViewMatrix = new THREE.Matrix4();
+        modelViewMatrix.multiplyMatrices(this.camera.matrixWorldInverse, this.plane.matrixWorld);
+        console.log(modelViewMatrix);
+
+        let modelViewMatrix2 = new THREE.Matrix4();
+        modelViewMatrix2.multiplyMatrices(this.camera.matrixWorldInverse, this.secondPlane.matrixWorld);
+        console.log(modelViewMatrix2);
 
         this.renderer.render(this.scene, this.camera);
     }

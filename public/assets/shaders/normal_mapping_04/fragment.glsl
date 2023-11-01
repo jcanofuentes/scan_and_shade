@@ -176,6 +176,7 @@ void main() {
     color += diffuseColor * (diffuse + ambient) + specAtten;
 
     gl_FragColor.rgb = vec3(color);
+    //gl_FragColor.r = uv.x;
     gl_FragColor.a = 1.0;
 }
 
