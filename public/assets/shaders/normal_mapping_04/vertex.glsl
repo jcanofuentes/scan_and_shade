@@ -56,7 +56,7 @@ void main() {
     vec4 vertexPositionCameraSpace = modelViewMatrix * vec4(position, 1.0);
     // Transforms the light position to camera space
     vec4 lightPositionCameraSpace = viewMatrix * vec4(lightPosition, 1.0);
-   // Calculates the vector from the vertex to the light in camera space. This will be interpolated in the fragment shader to approximate the direction from each fragment to the light.
+    // Calculates the vector from the vertex to the light in camera space. This will be interpolated in the fragment shader to approximate the direction from each fragment to the light.
     vLightRay = lightPositionCameraSpace.xyz - vertexPositionCameraSpace.xyz;
     gl_Position = projectionMatrix * vertexPositionCameraSpace;
     vUv = uv;
