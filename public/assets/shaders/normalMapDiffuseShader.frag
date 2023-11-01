@@ -1,6 +1,3 @@
-precision highp float;
-precision highp int;
-
 varying vec2 vUv;
 varying vec3 vViewPosition;
 varying vec3 vNormal;
@@ -8,6 +5,7 @@ varying vec3 vLightDirection;
 
 uniform sampler2D normalMap;
 uniform vec2 normalScale;
+
 
 vec3 perturbNormal2Arb(vec3 eye_pos, vec3 surf_norm, vec3 mapN) {
     vec3 q0 = vec3(dFdx(eye_pos.x), dFdx(eye_pos.y), dFdx(eye_pos.z));
@@ -37,9 +35,4 @@ void main() {
     vec3 l = normalize(l_dir);
     float intensity = max(dot(normal, l), 0.0);
     gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
-
-    //gl_FragColor = vec4(l_dir * 0.5 + 0.5, 1.0);
-
-    //vec4 col = vec4(abs(vViewPosition), 1.0);
-    //gl_FragColor = col;
 }
