@@ -23,7 +23,7 @@ void main() {
     // WRONG!!
     //vec4 lightPositionCameraSpace = modelViewMatrix * vec4(lightPosition, 1.0);
 
-    // GOOD!
+    // GOOD
     vec4 lightPositionCameraSpace = viewMatrix * vec4(lightPosition, 1.0);
 
 
