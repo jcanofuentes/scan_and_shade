@@ -40,6 +40,28 @@ This is where the Three.js scene is created and manipulated. It defines a `Three
 
 ## Usage
 
+## Setting Up Node.js
+
+This project requires Node.js version 18. To set up Node.js on your system, we recommend using NVM (Node Version Manager) for easy installation and management of multiple Node.js versions.
+
+### Installing NVM
+
+Open your terminal and run the following command to install NVM:
+
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+```
+
+Restart your terminal. Then:
+
+```
+nvm install node
+
+nvm install 18
+
+nvm use 18
+```
+
 ### Installation
 
 To install the necessary dependencies, navigate to the project directory and run:
@@ -47,6 +69,7 @@ To install the necessary dependencies, navigate to the project directory and run
 ```
 npm install
 ```
+
 
 ### Running the App
 
