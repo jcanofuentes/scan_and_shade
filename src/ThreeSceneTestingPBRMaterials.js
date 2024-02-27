@@ -50,7 +50,6 @@ class ThreeSceneTestingPBRMaterials extends React.Component {
                 map: this.diffuseMap,
                 normalMap: this.normalMap,
                 wireframe: false
-
             }
         );
         var plane = new THREE.Mesh(
