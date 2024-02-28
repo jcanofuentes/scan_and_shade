@@ -157,7 +157,7 @@ class SceneShader_NormalMapDiffuse extends React.Component {
         this.transformControl.attach(this.lightsGroup);
         this.transformControl.addEventListener('dragging-changed', (event) => { this.orbitsControl.enabled = !event.value; });
         this.scene.add(this.transformControl);
-
+        
         this.updateDimensions();
     }
 

@@ -3,128 +3,149 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui';
 
+class CustomAnimator extends EventTarget {
+    targetObject = null;
+    pos = new THREE.Vector3(0.0);
+    angle = 0.0;
+    deltaAngle = 0.01;
+    distance = 5.0;
+    constructor() {
+        super();
+    };
+    update( ) {
+        this.angle += this.deltaAngle;
+        this.pos.x = Math.sin(this.angle) * this.distance;
+        this.pos.y = 5;
+        this.pos.z = Math.cos(this.angle) * this.distance;
+
+        if (this.targetObject !== null) {
+            this.targetObject.position.x = this.pos.x;
+            this.targetObject.position.y = this.pos.y;
+            this.targetObject.position.z = this.pos.z;
+        }
+    }
+    setTargetObject(obj) {
+        this.targetObject = obj;
+    }
+}
+
+
 class ThreeSceneTestingPBRMaterials extends React.Component {
     constructor(props) {
         super(props);
-        console.log("Creating SceneStandardPipeline instance (inheriting from React.Component.)");
+        console.log("Creating " + this.constructor.name + " instance (inheriting from React.Component.)");
         this.loadManager = new THREE.LoadingManager();
         this.loadManager.onLoad = this.handleAllResourcesLoaded.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
+        this.plane_material = null;
+        this.lightAnimator = new CustomAnimator();
+        this.pointLight = null;
+    }    
+    loadTextures() {
+        console.log("Loading textures...");
+        this.textureLoader = new THREE.TextureLoader(this.loadManager);
+
+        // Parchment 
+        this.diffuseMap = this.textureLoader.load('/assets/maps/parchment/albedo.png');
+        this.normalMap = this.textureLoader.load('/assets/maps/parchment/normal.png');
+
+        /*
+        // Oil painting 
+        this.diffuseMap = this.textureLoader.load('/assets/maps/oil_painting/albedo.png');
+        this.normalMap = this.textureLoader.load('/assets/maps/oil_painting/normal.png');
+        */
     }
-    // ------------------------------------------------------------------------------
-    // Custom methods for handling the Three.js scene:
-    // ------------------------------------------------------------------------------
     handleAllResourcesLoaded() {
         console.log('All resources loaded succesfully!');
         this.setupScene();
     }
-    loadTextures() {
-        console.log("Loading textures...");
-        this.textureLoader = new THREE.TextureLoader(this.loadManager);
-        this.diffuseMap = this.textureLoader.load('/assets/PS_Albedo_4096.png');
-        this.diffuseMap.colorSpace = THREE.SRGBColorSpace;
-        this.normalMap = this.textureLoader.load('/assets/maps/PS_Normal_4096.png');
-    }
-    createSceneAndRenderer() {
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0x333333);
-        this.scene = new THREE.Scene();
-    }
-    createPerspectiveCamera() {
-        var fieldOfView = 60.0;
-        var aspectRatio = window.innerWidth / window.innerHeight;
-        var nearClippingPlane = 0.1;
-        var farClippingPlane = 1000.0;
-        var cameraDistance = 14.0;
-        this.camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearClippingPlane, farClippingPlane);
-        this.camera.position.set(0, 0, cameraDistance);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-    }
-    createCameraOrbitControls() {
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    }
-    createGeometry() {
-        const plane_material = new THREE.MeshPhongMaterial(
-            {
-                map: this.diffuseMap,
-                normalMap: this.normalMap,
-                wireframe: false
-            }
-        );
-        var plane = new THREE.Mesh(
-            new THREE.PlaneGeometry(10, 10, 1, 1),
-            plane_material
-        );
-        plane_material.normalScale = new THREE.Vector2(2.0,2.0);
-        plane_material.color = new THREE.Color(0.3,0.3,0.3);
-        this.scene.add(plane);
-    }
-    createLights() {
-        this.lightsGroup = new THREE.Group();
-        this.scene.add(this.lightsGroup);
-
-        this.pointLight = new THREE.PointLight(0xffffff, 1, 32, 1.1);
-        this.pointLight.position.set(0, 0, 5.25);
-        this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, 0.125);
-        this.scene.add(this.pointLightHelper);
-        this.lightsGroup.add(this.pointLight);
-
-        this.dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        this.dirLight.position.set(0, 0, 5.25);
-        this.dirHelper = new THREE.DirectionalLightHelper(this.dirLight, 0.5);
-        this.scene.add( this.dirHelper);
-        this.lightsGroup.add(this.dirLight);
-
-        this.dirLight.visible = true;
-        this.dirHelper.visible = true;
-        this.pointLight.visible = true;
-        this.pointLightHelper.visible = true;
-    }
-
-    createHelpers() {
-        const axesHelper = new THREE.AxesHelper(1);
-        this.scene.add(axesHelper);
-    }
     setupScene() {
         console.log('Scene setup...');
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0x222222);
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.set(0, 10, 0);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.scene.add(new THREE.AxesHelper(1));
+        //this.scene.add(new THREE.GridHelper());
 
-        THREE.ColorManagement.enabled = true;
-        this.createSceneAndRenderer();
-        //this.createHelpers();
-        this.createPerspectiveCamera();
-        this.createCameraOrbitControls();
-        this.createGeometry();
+        // Create point light
+        this.pointLight = new THREE.PointLight( 0xffffff, 1, 0 );
+        this.pointLight.position.set( 0, 0, 0 );
+        this.scene.add( this.pointLight );  
+        const sphereSize = 0.1;
+        this.pointLightHelper = new THREE.PointLightHelper( this.pointLight, sphereSize );
+        this.scene.add( this.pointLightHelper );
 
-        this.createLights();
+        this.lightAnimator.setTargetObject(this.pointLight);
 
-        const gui = new dat.GUI();
-        this.lightParameters = {
-            azimuth: 0.0,
-            distance: 0.0
-        };
-        const guiLightsGroup = gui.addFolder('Lighting');
-        guiLightsGroup.add(this.lightParameters, 'azimuth', -Math.PI, Math.PI);
-        guiLightsGroup.add(this.lightParameters, 'distance', -Math.PI, Math.PI);
+        // Create ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.28);
+        this.scene.add(ambientLight);
 
-        const options = {
-            toggle: false,
-        };
+        // Create a plane with a PBR material
+        const planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
 
-        // Choose between directional o point lights
-        guiLightsGroup.add(options, 'toggle').name('Point / Directional').onChange((value) => {
-            if (value) {
-                this.dirLight.visible = true;
-                this.dirHelper.visible = true;
-                this.pointLight.visible = false;
-                this.pointLightHelper.visible = false;
-            } else {
-                this.dirLight.visible = false;
-                this.dirHelper.visible = false;
-                this.pointLight.visible = true;
-                this.pointLightHelper.visible = true;
-            }
+
+        /*
+        this.plane_material = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            map: this.diffuseMap,
+            normalMap: this.normalMap,
+            roughness: 0.5,
+            metalness: 0.5
         });
+        */
+  
+        this.plane_material = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            map: this.diffuseMap,
+            normalMap: this.normalMap,
+            roughness: 0.78,
+            metalness: 0.16,
+            normalScale: new THREE.Vector2(5, 5)
+        });
+
+        const plane = new THREE.Mesh(planeGeometry, this.plane_material);
+        plane.rotation.x = -Math.PI / 2;
+        this.scene.add(plane);
+
+        // Create a GUI to control the material properties
+
+        this.materialParameters = {
+            color: this.plane_material.color.getHex(),
+            roughness: this.plane_material.roughness,
+            metalness: this.plane_material.metalness,
+            wireframe: this.plane_material.wireframe,
+            normalScale: this.plane_material.normalScale.x
+        };
+
+        this.gui = new dat.GUI();
+        const materialFolder = this.gui.addFolder('THREE.PBRMaterial')
+        materialFolder.addColor(this.plane_material, 'color');
+
+        materialFolder.add(this.materialParameters, 'roughness', 0, 1).onChange((value) => {
+            this.plane_material.roughness = value;
+        });
+        materialFolder.add(this.materialParameters, 'metalness', 0, 1).onChange((value) => {
+            this.plane_material.metalness = value;
+        });
+        materialFolder.add(this.plane_material, 'wireframe');
+
+        materialFolder.add(this.materialParameters, 'normalScale', -10, 10).onChange((value) => {
+            this.plane_material.normalScale.set(value, value);
+        });
+ 
+
+        /*
+        const torusKnotGeometry = new THREE.TorusKnotGeometry(1,0.4,64,16,2,3)
+        const torusKnot = new THREE.Mesh(torusKnotGeometry, this.plane_material)
+        torusKnot.position.x = -5
+        this.scene.add(torusKnot)
+        */
 
         this.mount.appendChild(this.renderer.domElement);
         this.animate();
@@ -140,8 +161,9 @@ class ThreeSceneTestingPBRMaterials extends React.Component {
     animate() {
         this.frameId = requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
-        this.lightsGroup.rotation.x = this.lightParameters.distance;
-        this.lightsGroup.rotation.y = this.lightParameters.azimuth;
+
+        this.lightAnimator.update();
+
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -162,7 +184,6 @@ class ThreeSceneTestingPBRMaterials extends React.Component {
         }
         window.removeEventListener("resize", this.updateDimensions);
     }
-
     render() {
         return (
             <div
@@ -171,8 +192,6 @@ class ThreeSceneTestingPBRMaterials extends React.Component {
             />
         );
     }
-
-
 }
 
 export default ThreeSceneTestingPBRMaterials;
